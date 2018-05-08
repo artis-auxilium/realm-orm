@@ -27,8 +27,9 @@
       "lcov"
     ],
     "collectCoverageFrom": [
-      "utils/**/*.js",
-      "index.js"
+      "libs/**/*.js",
+      "index.js",
+      "Model.js"
     ]
   },
   "devDependencies": {
