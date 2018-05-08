@@ -1,0 +1,43 @@
+{
+  "name": "realm-orm",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/artis-auxilium/realm-orm.git"
+  },
+  "bugs": {
+    "url": "https://github.com/artis-auxilium/realm-orm/issues"
+  },
+  "typings": "./index.d.ts",
+  "peerDependencies": {
+    "realm": "^2.4.0"
+  },
+  "dependencies": {
+    "deep-diff": "^1.0.0"
+  },
+  "jest": {
+    "transform": {
+      ".*": "<rootDir>/node_modules/babel-jest"
+    },
+    "collectCoverage": true,
+    "coverageReporters": [
+      "text-summary",
+      "lcov"
+    ],
+    "collectCoverageFrom": [
+      "utils/**/*.js",
+      "index.js"
+    ]
+  },
+  "devDependencies": {
+    "babel-core": "^6.26.3",
+    "babel-jest": "^22.4.3",
+    "babel-preset-env": "^1.6.1",
+    "babel-preset-stage-0": "^6.24.1",
+    "jest": "^22.4.3",
+    "realm": "^2.4.0",
+    "regenerator-runtime": "^0.11.1"
+  }
+}
