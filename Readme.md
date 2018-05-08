@@ -1,6 +1,6 @@
 # Realm-orm
 
-Simple orm for realm-js
+Simple orm for realm-js wiht query builder
 
 ## Installation
 
@@ -94,7 +94,8 @@ oldPeople.query()
 _For more examples and usage, please refer to the doc._
 * [model api](./docs/model.md)
 * [query api](./docs/query.md)
-
+## Stuff used to make this
+* [Realm-query](https://github.com/mrphu3074/realm-query): starting point of query builder
 ## Release History
 
 * 1.0.0
