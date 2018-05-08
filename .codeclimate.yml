@@ -1,0 +1,33 @@
+---
+version: "2"
+checks:
+  method-count:
+    enabled: true
+    config:
+      threshold: 50
+  file-lines:
+    enabled: true
+    config:
+      threshold: 370
+engines:
+  duplication:
+    enabled: true
+    config:
+      languages:
+        javascript:
+          mass_threshold: 50
+    exclude_paths:
+      - libs/__test__/query.test.js
+      - libs/query.js 
+      - __test__/
+  fixme:
+    enabled: true
+  eslint:
+    enabled: true
+    channel: eslint-4
+ratings:
+  paths:
+  - "**.js"
+exclude_paths:
+- node_modules/
+- coverage/
