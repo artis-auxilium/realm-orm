@@ -18,7 +18,6 @@
         * [.update(object, data)](#Model.update)
         * [.delete(object)](#Model.delete)
 
-
 * * *
 
 <a name="Model+update"></a>
@@ -32,6 +31,10 @@ update model
 | --- | --- |
 | data | <code>any</code> | 
 
+**Example**  
+```js
+Model.update({ field: 'value})
+```
 
 * * *
 
@@ -72,8 +75,21 @@ search object that contain text in stringFields
 | Param | Type | Description |
 | --- | --- | --- |
 | term | <code>string</code> |  |
-| limit | <code>number</code> \| <code>boolean</code> | (if true return query) |
+| limit | <code>number</code> \| <code>boolean</code> \| [<code>searchTextOption</code>](#searchTextOption) | (if true return query) |
 
+**Example**  
+```js
+// return Realm.Results
+Model.searchText('pers', 10)
+
+// return query instead of Realm.Results
+Model.searchText('pers', true)
+// more configurable search
+Model.searchText('dev', {
+  stringFields: ['hobbies', 'name'],
+  return: true
+});
+```
 
 * * *
 
@@ -158,6 +174,16 @@ delete results or object from database
 | --- | --- |
 | object | <code>Realm.Results</code> \| <code>Realm.Object</code> | 
 
-
 * * *
 
+<a name="searchTextOption"></a>
+
+## searchTextOption
+
+| Param | Type | Description |
+| --- | --- | --- |
+| stringFields | <code>Array</code> | array of string fields to search term |
+| return | <code>boolean</code> | return query when true (limit has no effect if true) |
+| limit | <code>number</code> |  |
+
+* * *

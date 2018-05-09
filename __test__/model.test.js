@@ -52,8 +52,10 @@ describe('Model', () => {
   });
 
   it('should update property', () => {
-    person.update({ label: 'new value' });
-    expect(person.label).toEqual('new value');
+    person.update({ name: 'new value' });
+    expect(person.name).toEqual('new value');
+    person.update({ name: 'first person' });
+    expect(person.name).toEqual('first person');
   });
 
   it('should delete model', () => {
@@ -102,6 +104,20 @@ describe('Model', () => {
     expect(res.length).toEqual(3);
     res = Person.searchText('pers', 2);
     expect(res.length).toEqual(2);
+    res = Person.searchText('dev', {
+      stringFields: ['hobbies', 'name'],
+      return: true
+    });
+    expect(res.toStringWithValues()).toEqual('((hobbies CONTAINS[c] "dev") OR (name CONTAINS[c] "dev"))');
+    res = Person.searchText('dev', {
+      limit: 5,
+      return: true
+    });
+    expect(res.toStringWithValues()).toEqual('((name CONTAINS[c] "dev"))');
+    res = Person.searchText('dev', {
+      stringFields: ['hobbies', 'name'],
+    });
+    expect(res.length).toEqual(3);
     expect(Person.searchText('pers', true)).toBeInstanceOf(RealmQuery);
   });
 
