@@ -215,6 +215,12 @@ declare class RealmQuery<M> {
      */
     like(fieldName: string, value: string): RealmQuery<M>;
     /**
+     *
+     * @param fieldName
+     * @param value
+     */
+    orLike(fieldName: string, value: string): RealmQuery<M>;
+    /**
      * Finds the maximum value of a field
      *
      * @param fieldName {string}
@@ -273,11 +279,6 @@ declare class RealmQuery<M> {
      * Create new query
      * @param objects {Realm.Collection}
      */
-    static where(objects: Results<M>): RealmQuery<M>;
-    /**
-     * Create new query. Alias of where
-     * @param objects {Realm.Collection}
-     */
-    static create(objects?: Results<M>): RealmQuery<M>;
+    static query(objects: Results<M>): RealmQuery<M>;
 }
 export default RealmQuery;

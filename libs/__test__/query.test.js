@@ -89,6 +89,14 @@ describe('RealmQuery', function () {
       expect(query.toStringWithValues()).toEqual('name ENDSWITH[c] "phu"');
     });
   });
+  describe('like', function () {
+    it('like', function () {
+      query.like('name', '*phu?');
+      expect(query.toStringWithValues()).toEqual('name LIKE "*phu?"');
+      query.orLike('name', '*pha*');
+      expect(query.toStringWithValues()).toEqual('name LIKE "*phu?" OR name LIKE "*pha*"');
+    });
+  });
   describe('contains', function () {
     it('contains not casing', function () {
       query.contains('name', 'phu');
@@ -356,6 +364,15 @@ describe('Get objects with RealmQuery', function () {
     expect(results.length).toEqual(2);
   });
 
+
+  it('should find like', () => {
+    let query = RealmQuery
+      .query(realm.objects('Person'))
+      .like('name', '*ma*');
+    let results = query.findAll();
+    expect(results.length).toEqual(2);
+  });
+
   it('Find first', function () {
     let query = RealmQuery.query(realm.objects('Person'));
     let result = query.findFirst();
@@ -399,10 +416,4 @@ describe('Get objects with RealmQuery', function () {
     expect(results.length).toEqual(4);
   });
 
-});
-
-describe('Methods that RealmQuery not yet supported', function () {
-  it('like', function () {
-    expect(RealmQuery.query().like).toThrow('Not yet supported "like');
-  });
 });
