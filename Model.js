@@ -46,16 +46,41 @@ export default class Model extends RealmObject {
   static stringFields = []
 
   /**
+   * @typedef searchTextOption
+   * @param {Array} stringFields array of string fields to search term
+   * @param {boolean} return return query when true (limit has no effect if true)
+   * @param {number} limit
+   */
+
+  /**
    * search object that contain text in stringFields
    *
    * @static
    * @param {string} term
-   * @param {number|boolean} limit (if true return query)
+   * @param {number|boolean|searchTextOption} limit (if true return query)
    * @returns {Realm.Results|RealmQuery}
    * @memberof Model
+   * @example
+   * // return Realm.Results
+   * Model.searchText('pers', 10)
+   * 
+   * // return query instead of Realm.Results
+   * Model.searchText('pers', true)
+   * // more configurable search
+   * Model.searchText('dev', {
+   *   stringFields: ['hobbies', 'name'],
+   *   return: true
+   * });
    */
   static searchText (term, limit) {
-    if (this.stringFields.length === 0) {
+    let returnQuery = limit && typeof limit === 'boolean';
+    let stringFields = this.stringFields;
+    if (typeof limit === 'object') {
+      stringFields = limit.stringFields || stringFields;
+      returnQuery = limit.return;
+      limit = limit.limit;
+    }
+    if (stringFields.length === 0) {
       throw new Error('stringFields not defined');
     }
     let terms = term.trim().split(' ');
@@ -68,8 +93,8 @@ export default class Model extends RealmObject {
       terms.forEach(queryField);
       query.endGroup();
     };
-    this.stringFields.forEach(createQuery);
-    if (limit && typeof limit === 'boolean') {
+    stringFields.forEach(createQuery);
+    if (returnQuery) {
       return query;
     }
     let res = query.findAll();
@@ -193,6 +218,8 @@ export default class Model extends RealmObject {
    * @param {any} data
    * @instance
    * @memberof Model
+   * @example
+   * Model.update({ field: 'value})
    */
   update (data) {
     Model.update(this, data);
