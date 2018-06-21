@@ -1,4 +1,4 @@
-import deep from 'deep-diff';
+import deep from './diff';
 export default (from, to) => {
   deep.observableDiff(to, from, (d) => {
     /* istanbul ignore if  */

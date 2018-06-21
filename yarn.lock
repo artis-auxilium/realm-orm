@@ -1303,10 +1303,6 @@ decompress@^4.2.0:
     pify "^2.3.0"
     strip-dirs "^2.0.0"
 
-deep-diff@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/deep-diff/-/deep-diff-1.0.0.tgz#0dd55f9412f22a07b2edbfbb11bb4633be6be40b"
-
 deep-extend@^0.5.1:
   version "0.5.1"
   resolved "https://registry.yarnpkg.com/deep-extend/-/deep-extend-0.5.1.tgz#b894a9dd90d3023fbf1c55a394fb858eb2066f1f"

@@ -14,9 +14,7 @@
   "peerDependencies": {
     "realm": "^2.4.0"
   },
-  "dependencies": {
-    "deep-diff": "^1.0.0"
-  },
+  "dependencies": {},
   "jest": {
     "transform": {
       ".*": "<rootDir>/node_modules/babel-jest"
