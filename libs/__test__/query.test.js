@@ -364,6 +364,13 @@ describe('Get objects with RealmQuery', function () {
     expect(results.length).toEqual(2);
   });
 
+  it('should find between', () => {
+    let query = RealmQuery
+      .query(realm.objects('Person'))
+      .between('age', 30, 50);
+    let results = query.findAll();
+    expect(results.length).toEqual(2);
+  });
 
   it('should find like', () => {
     let query = RealmQuery
