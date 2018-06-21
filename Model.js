@@ -63,7 +63,7 @@ export default class Model extends RealmObject {
    * @example
    * // return Realm.Results
    * Model.searchText('pers', 10)
-   * 
+   *
    * // return query instead of Realm.Results
    * Model.searchText('pers', true)
    * // more configurable search
@@ -166,7 +166,7 @@ export default class Model extends RealmObject {
   }
   /**
  * @private
- * @param {any} data 
+ * @param {any} data
  */
   static doInsert (data) {
     /* istanbul ignore next  */
@@ -183,10 +183,10 @@ export default class Model extends RealmObject {
     DB.db.create(this.schema.name, data, this.hasPrimary(data));
   }
   /**
-   * update object 
+   * update object
    * @static
-   * @param {Realm.Object} object 
-   * @param {any} data 
+   * @param {Realm.Object} object
+   * @param {any} data
    * @memberof Model
    */
   static update (object, data) {
@@ -194,7 +194,7 @@ export default class Model extends RealmObject {
   }
   /**
    * delete results or object from database
-   * @param {Realm.Results|Realm.Object} object 
+   * @param {Realm.Results|Realm.Object} object
    * @memberof Model
    */
   static delete (object) {
@@ -219,7 +219,7 @@ export default class Model extends RealmObject {
    * @instance
    * @memberof Model
    * @example
-   * Model.update({ field: 'value})
+   * Model.update({ field: 'value'})
    */
   update (data) {
     Model.update(this, data);

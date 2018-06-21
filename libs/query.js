@@ -409,12 +409,23 @@ class RealmQuery {
     return this.lessThanOrEqualTo(fieldName, value, 'OR');
   }
   /**
+   * Like operator
    * @private
    * @param fieldName
    * @param value
    */
-  like () {
-    throw new Error('Not yet supported "like"');
+  like (fieldName, value, condition = 'AND') {
+    let pos = this.addValue(value);
+    return this.addCriteria(`${fieldName} LIKE $${pos}`, condition);
+  }
+  /**
+   * Like operator
+   * @private
+   * @param fieldName
+   * @param value
+   */
+  orLike (fieldName, value) {
+    return this.like(fieldName, value, 'OR');
   }
   /**
    * start a NOT operator

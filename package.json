@@ -1,6 +1,6 @@
 {
   "name": "realm-orm",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "main": "index.js",
   "license": "MIT",
   "repository": {
@@ -14,9 +14,7 @@
   "peerDependencies": {
     "realm": "^2.4.0"
   },
-  "dependencies": {
-    "deep-diff": "^1.0.0"
-  },
+  "dependencies": {},
   "jest": {
     "transform": {
       ".*": "<rootDir>/node_modules/babel-jest"
