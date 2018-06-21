@@ -25,15 +25,15 @@
 ### model.update(data)
 update model
 
-**Kind**: instance method of [<code>Model</code>](#Model)  
+**Kind**: instance method of [<code>Model</code>](#Model)
 
 | Param | Type |
 | --- | --- |
-| data | <code>any</code> | 
+| data | <code>any</code> |
 
-**Example**  
+**Example**
 ```js
-Model.update({ field: 'value})
+Model.update({ field: 'value'})
 ```
 
 * * *
@@ -43,7 +43,7 @@ Model.update({ field: 'value})
 ### model.delete()
 delete model
 
-**Kind**: instance method of [<code>Model</code>](#Model)  
+**Kind**: instance method of [<code>Model</code>](#Model)
 
 * * *
 
@@ -52,7 +52,7 @@ delete model
 ### *Model.schema : <code>Realm.ObjectSchema</code>*
 Model schema
 
-**Kind**: static abstract property of [<code>Model</code>](#Model)  
+**Kind**: static abstract property of [<code>Model</code>](#Model)
 
 * * *
 
@@ -61,7 +61,7 @@ Model schema
 ### *Model.stringFields : <code>Array.&lt;string&gt;</code>*
 Array of string used for search text
 
-**Kind**: static abstract property of [<code>Model</code>](#Model)  
+**Kind**: static abstract property of [<code>Model</code>](#Model)
 
 * * *
 
@@ -70,14 +70,14 @@ Array of string used for search text
 ### Model.searchText(term, limit) ⇒ <code>Realm.Results</code> \| <code>RealmQuery</code>
 search object that contain text in stringFields
 
-**Kind**: static method of [<code>Model</code>](#Model)  
+**Kind**: static method of [<code>Model</code>](#Model)
 
 | Param | Type | Description |
 | --- | --- | --- |
 | term | <code>string</code> |  |
 | limit | <code>number</code> \| <code>boolean</code> \| [<code>searchTextOption</code>](#searchTextOption) | (if true return query) |
 
-**Example**  
+**Example**
 ```js
 // return Realm.Results
 Model.searchText('pers', 10)
@@ -98,7 +98,7 @@ Model.searchText('dev', {
 ### Model.query() ⇒ <code>RealmQuery</code>
 get a query instance of Model
 
-**Kind**: static method of [<code>Model</code>](#Model)  
+**Kind**: static method of [<code>Model</code>](#Model)
 
 * * *
 
@@ -107,11 +107,11 @@ get a query instance of Model
 ### Model.find(id) ⇒ [<code>Model</code>](#Model)
 Find object by its primary key
 
-**Kind**: static method of [<code>Model</code>](#Model)  
+**Kind**: static method of [<code>Model</code>](#Model)
 
 | Param | Type |
 | --- | --- |
-| id | <code>number</code> | 
+| id | <code>number</code> |
 
 
 * * *
@@ -121,7 +121,7 @@ Find object by its primary key
 ### Model.all() ⇒ <code>Realm.Results</code>
 get all Object of model
 
-**Kind**: static method of [<code>Model</code>](#Model)  
+**Kind**: static method of [<code>Model</code>](#Model)
 
 * * *
 
@@ -130,7 +130,7 @@ get all Object of model
 ### Model.ids() ⇒ <code>Array</code>
 Get all primaryKey of Model
 
-**Kind**: static method of [<code>Model</code>](#Model)  
+**Kind**: static method of [<code>Model</code>](#Model)
 
 * * *
 
@@ -139,11 +139,11 @@ Get all primaryKey of Model
 ### Model.insert(data) ⇒ <code>Promise.&lt;void&gt;</code>
 insert new object in database
 
-**Kind**: static method of [<code>Model</code>](#Model)  
+**Kind**: static method of [<code>Model</code>](#Model)
 
 | Param | Type |
 | --- | --- |
-| data | <code>array</code> \| <code>any</code> | 
+| data | <code>array</code> \| <code>any</code> |
 
 
 * * *
@@ -153,12 +153,12 @@ insert new object in database
 ### Model.update(object, data)
 update object
 
-**Kind**: static method of [<code>Model</code>](#Model)  
+**Kind**: static method of [<code>Model</code>](#Model)
 
 | Param | Type |
 | --- | --- |
-| object | <code>Realm.Object</code> | 
-| data | <code>any</code> | 
+| object | <code>Realm.Object</code> |
+| data | <code>any</code> |
 
 
 * * *
@@ -168,11 +168,11 @@ update object
 ### Model.delete(object)
 delete results or object from database
 
-**Kind**: static method of [<code>Model</code>](#Model)  
+**Kind**: static method of [<code>Model</code>](#Model)
 
 | Param | Type |
 | --- | --- |
-| object | <code>Realm.Results</code> \| <code>Realm.Object</code> | 
+| object | <code>Realm.Results</code> \| <code>Realm.Object</code> |
 
 * * *
 
