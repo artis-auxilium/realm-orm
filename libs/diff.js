@@ -6,7 +6,7 @@ class Diff {
   constructor(kind, path) {
     this.kind = kind;
     if (path && path.length) {
-      this.path = path
+      this.path = path;
     }
   }
 }
@@ -36,7 +36,7 @@ class DiffArray extends Diff {
   constructor(path, index, item) {
     super('A', path);
     this.index = index;
-    this.item = item
+    this.item = item;
   }
 }
 
@@ -201,29 +201,29 @@ function applyArrayChange(arr, index, change) {
       it = it[change.path[i]];
     }
     switch (change.kind) {
-      case 'A':
-        applyArrayChange(it[change.path[i]], change.index, change.item);
-        break;
-      case 'D':
-        delete it[change.path[i]];
-        break;
-      case 'E':
-      case 'N':
-        it[change.path[i]] = change.rhs;
-        break;
+    case 'A':
+      applyArrayChange(it[change.path[i]], change.index, change.item);
+      break;
+    case 'D':
+      delete it[change.path[i]];
+      break;
+    case 'E':
+    case 'N':
+      it[change.path[i]] = change.rhs;
+      break;
     }
   } else {
     switch (change.kind) {
-      case 'A':
-        applyArrayChange(arr[index], change.index, change.item);
-        break;
-      case 'D':
-        arr = arrayRemove(arr, index);
-        break;
-      case 'E':
-      case 'N':
-        arr[index] = change.rhs;
-        break;
+    case 'A':
+      applyArrayChange(arr[index], change.index, change.item);
+      break;
+    case 'D':
+      arr = arrayRemove(arr, index);
+      break;
+    case 'E':
+    case 'N':
+      arr[index] = change.rhs;
+      break;
     }
   }
   return arr;
@@ -244,19 +244,19 @@ function applyChange(target, source, change) {
       it = it[change.path[i]];
     }
     switch (change.kind) {
-      case 'A':
-        if (change.path && typeof it[change.path[i]] === 'undefined') {
-          it[change.path[i]] = [];
-        }
-        applyArrayChange(change.path ? it[change.path[i]] : it, change.index, change.item);
-        break;
-      case 'D':
-        delete it[change.path[i]];
-        break;
-      case 'E':
-      case 'N':
-        it[change.path[i]] = change.rhs;
-        break;
+    case 'A':
+      if (change.path && typeof it[change.path[i]] === 'undefined') {
+        it[change.path[i]] = [];
+      }
+      applyArrayChange(change.path ? it[change.path[i]] : it, change.index, change.item);
+      break;
+    case 'D':
+      delete it[change.path[i]];
+      break;
+    case 'E':
+    case 'N':
+      it[change.path[i]] = change.rhs;
+      break;
     }
   }
 }

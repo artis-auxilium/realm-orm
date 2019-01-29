@@ -1,6 +1,6 @@
 {
   "name": "realm-orm",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "main": "index.js",
   "license": "MIT",
   "repository": {
@@ -12,13 +12,14 @@
   },
   "typings": "./index.d.ts",
   "peerDependencies": {
-    "realm": "^2.4.0"
+    "realm": "^2.18.0"
   },
   "dependencies": {},
   "jest": {
     "transform": {
       ".*": "<rootDir>/node_modules/babel-jest"
     },
+    "testURL": "http://localhost/",
     "collectCoverage": true,
     "coverageReporters": [
       "text-summary",

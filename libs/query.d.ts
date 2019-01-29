@@ -267,7 +267,7 @@ declare class RealmQuery<M> {
      * Set sorted into realm.objects
      *
      * @param fieldName {string}
-     * @param order {ASC|DESC}
+     * @param order {boolean} true => desc, false => asc
      * @return {RealmQuery}
      */
     sort(fieldName: string, order?: 'ASC' | 'DESC'): RealmQuery<M>;

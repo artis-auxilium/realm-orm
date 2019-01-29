@@ -30,6 +30,7 @@ class RealmQuery {
   objects;
   criteria = [];
   values = [];
+  sorted = [];
   path = '';
 
   /**
@@ -66,6 +67,9 @@ class RealmQuery {
     if (query) {
       results = results.filtered(query, ...this.values);
     }
+    if (this.sorted.length > 0) {
+      results = results.sorted(this.sorted);
+    }
     return results;
   }
 
@@ -90,6 +94,16 @@ class RealmQuery {
       return criteria;
     };
     return this.criteria.map(toString).join(' ');
+  }
+
+  /**
+  * Sort result
+  * @param {string} fieldName
+  * @param {boolean} true => desc, false => asc
+  */
+  sort (fieldName, desc = false) {
+    this.sorted.push([ fieldName, desc ])
+    return this;
   }
 
   /**
@@ -356,7 +370,7 @@ class RealmQuery {
    * @returns {RealmQuery}
    */
   isNotNull (fieldName) {
-    return this.addCriteria(`${fieldName} != null`);
+    return this.addCriteria(`${fieldName} != null`, 'AND');
   }
   /**
    * null comparaison
@@ -364,7 +378,22 @@ class RealmQuery {
    * @returns {RealmQuery}
    */
   isNull (fieldName) {
-    return this.addCriteria(`${fieldName} == null`);
+    return this.addCriteria(`${fieldName} == null`, 'AND');
+  }  /**
+   * not null comparaison
+   * @param {string} fieldName 
+   * @returns {RealmQuery}
+   */
+  orIsNotNull (fieldName) {
+    return this.addCriteria(`${fieldName} != null`, 'OR');
+  }
+  /**
+   * null comparaison
+   * @param {string} fieldName 
+   * @returns {RealmQuery}
+   */
+  orIsNull (fieldName) {
+    return this.addCriteria(`${fieldName} == null`, 'OR');
   }
   /**
    * Less-than comparaison

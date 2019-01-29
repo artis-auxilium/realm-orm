@@ -1,6 +1,7 @@
 import Realm from 'realm';
 import RealmQuery from '../query';
 import Person from '../../__test__/models/Person';
+import Holiday from '../../__test__/models/Holiday';
 
 describe('RealmQuery', function () {
   /**
@@ -302,7 +303,7 @@ describe('Get objects with RealmQuery', function () {
   let realm = new Realm({
     path: '/tmp/io.izlab.realmquery.test',
     inMemory: true,
-    schema: [ Person ]
+    schema: [ Holiday, Person ]
   });
   realm.write(() => {
     realm.deleteAll();
@@ -311,6 +312,7 @@ describe('Get objects with RealmQuery', function () {
       name: 'clinton',
       age: 18,
       hobbies: 'surf',
+      holidays: [],
       createdAt: new Date('2004-12-06 03:34:06')
     });
     realm.create('Person', {
@@ -318,11 +320,17 @@ describe('Get objects with RealmQuery', function () {
       name: 'necati',
       age: 34,
       hobbies: 'dev',
+      holidays: [
+        {
+          id: 1,
+          name: 'Paris'
+        }
+      ],
       createdAt: new Date('2011-09-26 16:42:17')
     });
-    realm.create('Person', { id: 3, name: 'norman', age: 28, createdAt: new Date('2015-06-14 20:57:46') });
-    realm.create('Person', { id: 4, name: 'elias', age: 42, createdAt: new Date('2006-06-13 04:35:02') });
-    realm.create('Person', { id: 5, name: 'martin', age: 18, createdAt: new Date('2003-01-14 14:12:50') });
+    realm.create('Person', { id: 3, name: 'norman', age: 28,holidays: [], createdAt: new Date('2015-06-14 20:57:46') });
+    realm.create('Person', { id: 4, name: 'elias', age: 42,holidays: [], createdAt: new Date('2006-06-13 04:35:02') });
+    realm.create('Person', { id: 5, name: 'martin', age: 18,holidays: [], createdAt: new Date('2003-01-14 14:12:50') });
   });
 
   it('should group', () => {
@@ -348,6 +356,11 @@ describe('Get objects with RealmQuery', function () {
   it('should find not null', () => {
     let results = RealmQuery.query(realm.objects(Person.schema.name)).isNotNull('hobbies').findAll();
     expect(results).toHaveLength(2);
+  });  
+
+  it('should find not null on nested', () => {
+    let results = RealmQuery.query(realm.objects(Person.schema.name)).between('age', 33, 35).isNotNull('holidays.name').findAll();
+    expect(results).toHaveLength(1);
   });
 
   it('Find all', function () {
@@ -401,6 +414,18 @@ describe('Get objects with RealmQuery', function () {
       .findFirst();
     expect(result.id).toEqual(2);
   });
+
+ it('Sort results', function () {
+    let result = RealmQuery
+      .query(realm.objects('Person'))
+      .sort('age')
+      .sort('name', true)
+      .findAll();
+    expect(result[0].name).toEqual('martin');
+    expect(result[1].name).toEqual('clinton');
+  });
+
+
 
   it('Count', function () {
     let total = RealmQuery

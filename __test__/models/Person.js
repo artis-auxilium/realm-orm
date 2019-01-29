@@ -12,6 +12,7 @@ export default class First extends Model {
         type: 'string',
         optional: true
       },
+      holidays: 'Holiday[]',
       age: 'int',
       createdAt: 'date'
     }

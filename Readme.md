@@ -111,6 +111,7 @@ _For more examples and usage, please refer to the doc._
 ## Stuff used to make this
 
 * [Realm-query](https://github.com/mrphu3074/realm-query): starting point of query builder
+* [diff](https://github.com/flitbit/diff): used to update model
 
 ## Release History
 
