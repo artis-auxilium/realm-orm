@@ -415,6 +415,18 @@ describe('Get objects with RealmQuery', function () {
     expect(result.id).toEqual(2);
   });
 
+ it('Sort results', function () {
+    let result = RealmQuery
+      .query(realm.objects('Person'))
+      .sort('age')
+      .sort('name', true)
+      .findAll();
+    expect(result[0].name).toEqual('martin');
+    expect(result[1].name).toEqual('clinton');
+  });
+
+
+
   it('Count', function () {
     let total = RealmQuery
       .query(realm.objects('Person'))

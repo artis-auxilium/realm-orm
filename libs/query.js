@@ -30,6 +30,7 @@ class RealmQuery {
   objects;
   criteria = [];
   values = [];
+  sorted = [];
   path = '';
 
   /**
@@ -66,6 +67,9 @@ class RealmQuery {
     if (query) {
       results = results.filtered(query, ...this.values);
     }
+    if (this.sorted.length > 0) {
+      results = results.sorted(this.sorted);
+    }
     return results;
   }
 
@@ -90,6 +94,16 @@ class RealmQuery {
       return criteria;
     };
     return this.criteria.map(toString).join(' ');
+  }
+
+  /**
+  * Sort result
+  * @param {string} fieldName
+  * @param {boolean} true => desc, false => asc
+  */
+  sort (fieldName, desc = false) {
+    this.sorted.push([ fieldName, desc ])
+    return this;
   }
 
   /**
