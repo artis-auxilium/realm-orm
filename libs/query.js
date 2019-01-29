@@ -356,7 +356,7 @@ class RealmQuery {
    * @returns {RealmQuery}
    */
   isNotNull (fieldName) {
-    return this.addCriteria(`${fieldName} != null`);
+    return this.addCriteria(`${fieldName} != null`, 'AND');
   }
   /**
    * null comparaison
@@ -364,7 +364,22 @@ class RealmQuery {
    * @returns {RealmQuery}
    */
   isNull (fieldName) {
-    return this.addCriteria(`${fieldName} == null`);
+    return this.addCriteria(`${fieldName} == null`, 'AND');
+  }  /**
+   * not null comparaison
+   * @param {string} fieldName 
+   * @returns {RealmQuery}
+   */
+  orIsNotNull (fieldName) {
+    return this.addCriteria(`${fieldName} != null`, 'OR');
+  }
+  /**
+   * null comparaison
+   * @param {string} fieldName 
+   * @returns {RealmQuery}
+   */
+  orIsNull (fieldName) {
+    return this.addCriteria(`${fieldName} == null`, 'OR');
   }
   /**
    * Less-than comparaison

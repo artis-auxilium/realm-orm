@@ -1,6 +1,7 @@
 import RealmQuery from '../libs/query';
 import Person from './models/Person';
 import TPerson from './models/TPerson';
+import Holiday from './models/Holiday';
 import DB from '../';
 
 describe('Model', () => {
@@ -9,6 +10,7 @@ describe('Model', () => {
       path: '/tmp/realm.test',
       inMemory: true,
       schema: [
+        Holiday,
         Person,
         TPerson
       ]
