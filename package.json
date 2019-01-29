@@ -19,6 +19,7 @@
     "transform": {
       ".*": "<rootDir>/node_modules/babel-jest"
     },
+    "testURL": "http://localhost/",
     "collectCoverage": true,
     "coverageReporters": [
       "text-summary",
