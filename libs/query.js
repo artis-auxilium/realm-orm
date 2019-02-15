@@ -10,6 +10,15 @@ let reducePath = (obj, index) => obj[index];
   * @param { string | number | boolean | Date}
   */
 
+class rawQuery {
+  constructor (raw) {
+    this.raw = raw;
+  }
+  toString() {
+    return this.raw;
+  }
+}
+
 /**
  *
  *
@@ -31,6 +40,7 @@ class RealmQuery {
   criteria = [];
   values = [];
   sorted = [];
+  distincts = [];
   path = '';
 
   /**
@@ -59,16 +69,16 @@ class RealmQuery {
   /**
    * @private
    * get filtered object
-   * @returns {Results}
+   * @returns {Realm.Results}
    */
   getFilteredObjects () {
+    if ((this.sorted.length > 0 || this.distincts.length > 0) && this.criteria.length === 0) {
+      throw new Error('Can\'t have sort or distinct without query filter');
+    }
     const query = this.toString();
     let results = this.objects;
     if (query) {
       results = results.filtered(query, ...this.values);
-    }
-    if (this.sorted.length > 0) {
-      results = results.sorted(this.sorted);
     }
     return results;
   }
@@ -93,16 +103,43 @@ class RealmQuery {
       }
       return criteria;
     };
-    return this.criteria.map(toString).join(' ');
+    let query = this.criteria.map(toString).join(' ');
+    if (this.sorted.length > 0) {
+      query = `${query} SORT(${this.sorted.join(', ')}) `;
+    }
+    if (this.distincts.length > 0) {
+      query = `${query} DISTINCT(${this.distincts.join(', ')})`;
+    }
+
+    return query;
+  }
+
+  /**
+   * select distinct element
+   *
+   * @param {string|string[]} fieldName
+   * @return {RealmQuery}
+   */
+  distinct (fieldName) {
+    if (Array.isArray(fieldName)) {
+      this.distincts = this.distincts.concat(fieldName);
+      return this;
+    }
+    this.distincts.push(fieldName);
+    return this;
   }
 
   /**
   * Sort result
   * @param {string} fieldName
-  * @param {boolean} true => desc, false => asc
+  * @param {'ASC'|'DESC'} order
   */
-  sort (fieldName, desc = false) {
-    this.sorted.push([ fieldName, desc ])
+  sort (fieldName, order = 'ASC') {
+    if (typeof order ==='boolean') {
+      console.warn('RealmQuery: use of old sort, should use "ASC" or "DESC');
+      order = order ? 'DESC' : 'ASC';
+    }
+    this.sorted.push(`${fieldName} ${order}`);
     return this;
   }
 
@@ -661,5 +698,7 @@ class RealmQuery {
     return new RealmQuery(objects);
   }
 }
+
+RealmQuery.raw = (query) => new rawQuery(query);
 
 export default RealmQuery;

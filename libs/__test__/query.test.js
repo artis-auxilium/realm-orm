@@ -415,14 +415,24 @@ describe('Get objects with RealmQuery', function () {
     expect(result.id).toEqual(2);
   });
 
- it('Sort results', function () {
+  it('Sort results', function () {
     let result = RealmQuery
       .query(realm.objects('Person'))
+      .greaterThan('age', 0)
       .sort('age')
-      .sort('name', true)
+      .sort('name', 'DESC')
       .findAll();
     expect(result[0].name).toEqual('martin');
     expect(result[1].name).toEqual('clinton');
+  });
+  it('Sort results without filter', function () {
+    let result = RealmQuery
+      .query(realm.objects('Person'))
+      .sort('age')
+      .sort('name', 'ASC');
+    expect(() => {
+      result.findAll();
+    }).toThrowError('Can\'t have sort or distinct without query filter');
   });
 
 
@@ -432,6 +442,30 @@ describe('Get objects with RealmQuery', function () {
       .query(realm.objects('Person'))
       .count();
     expect(total).toEqual(5);
+  });
+  it('Max', function () {
+    let total = RealmQuery
+      .query(realm.objects('Person'))
+      .max('age');
+    expect(total).toEqual(42);
+  });
+  it('min', function () {
+    let total = RealmQuery
+      .query(realm.objects('Person'))
+      .min('age');
+    expect(total).toEqual(18);
+  });
+  it('avg', function () {
+    let total = RealmQuery
+      .query(realm.objects('Person'))
+      .avg('age');
+    expect(total).toEqual(28);
+  });
+  it('sum', function () {
+    let total = RealmQuery
+      .query(realm.objects('Person'))
+      .sum('age');
+    expect(total).toEqual(140);
   });
 
   it('Count with filtered', function () {
@@ -444,8 +478,10 @@ describe('Get objects with RealmQuery', function () {
   it('Distinct', function () {
     let results = RealmQuery
       .query(realm.objects('Person'))
-      .distinct('age');
+      .greaterThan('age', 0)
+      .distinct('age').findAll();
     expect(results.length).toEqual(4);
+    expect(results).toBeInstanceOf(Realm.Results);
   });
 
 });
