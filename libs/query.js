@@ -107,30 +107,70 @@ class RealmQuery {
   }
 
   /**
-   * Condition that the value of field begins with the specified string
-   *
-   * @param {string} fieldName
-   * @param {string} value
-   * @param {?boolean} casing  BEGINSWITH[c] or BEGINSWITH
-   * @return {RealmQuery}
+   * Finds all objects that fulfill the query conditions
+   * @return {Realm.Results}
    */
-  beginsWith (fieldName, value, casing, condition = 'AND') {
-    const op = casing ? 'BEGINSWITH[c]' : 'BEGINSWITH';
-    let pos = this.addValue(value);
-    return this.addCriteria(`${fieldName} ${op} $${pos}`, condition);
+  findAll () {
+    return this.getFilteredObjects();
+  }
+  /**
+   * Finds the first object that fulfills the query conditions
+   * @return {Realm.Object}
+   */
+  findFirst () {
+    let results = this.getFilteredObjects();
+    return results.length ? results[0] : /* istanbul ignore next  */ undefined;
   }
 
   /**
-   * OR Condition that the value of field begins with the specified string
+   * Returns the maximum value of the values in the collection or of the given property
+   * among all the objects in the collection, or undefined if the collection is empty.
+   * Only supported for int, float, double and date properties.
+   * null values are ignored entirely by this method and will not be returned.
    *
    * @param {string} fieldName
-   * @param {string} value
-   * @param {?boolean} casing  BEGINSWITH[c] or BEGINSWITH
-   * @return {RealmQuery}
+   * @returns {number}
    */
-  orBeginsWith (fieldName, value, casing) {
-    return this.beginsWith(fieldName, value, casing, 'OR');
+  max (fieldName) {
+    return this.getFilteredObjects().max(fieldName);
   }
+
+  /**
+   * Returns the minimum value of the values in the collection or of the given property
+   * among all the objects in the collection, or undefined if the collection is empty.
+   * Only supported for int, float, double and date properties.
+   * null values are ignored entirely by this method and will not be returned
+   *
+   * @param {string} fieldName
+   */
+  min (fieldName) {
+    return this.getFilteredObjects().min(fieldName);
+  }
+  /**
+   *
+   * @param {string} fieldName
+   */
+  sum (fieldName) {
+    return this.getFilteredObjects().sum(fieldName);
+  }
+  /**
+   *
+   * @param {string} fieldName
+   */
+  avg (fieldName) {
+    return this.getFilteredObjects().avg(fieldName);
+  }
+
+  /**
+   * Counts the number of objects that fulfill the query conditions
+   *
+   * @return {number}
+   */
+  count () {
+    let results = this.getFilteredObjects();
+    return results.length;
+  }
+
   /**
    * Between condition
    *
@@ -158,6 +198,31 @@ class RealmQuery {
     let posTo = this.addValue(to);
     return this.addCriteria(`(${fieldName} >= $${posFrom} AND ${fieldName} <= $${posTo})`, 'OR');
   }
+
+  /**
+   * Condition that the value of field begins with the specified string
+   *
+   * @param {string} fieldName
+   * @param {string} value
+   * @param {?boolean} casing  BEGINSWITH[c] or BEGINSWITH
+   * @return {RealmQuery}
+   */
+  beginsWith (fieldName, value, casing, condition = 'AND') {
+    const op = casing ? 'BEGINSWITH[c]' : 'BEGINSWITH';
+    let pos = this.addValue(value);
+    return this.addCriteria(`${fieldName} ${op} $${pos}`, condition);
+  }
+  /**
+   * OR Condition that the value of field begins with the specified string
+   *
+   * @param {string} fieldName
+   * @param {string} value
+   * @param {?boolean} casing  BEGINSWITH[c] or BEGINSWITH
+   * @return {RealmQuery}
+   */
+  orBeginsWith (fieldName, value, casing) {
+    return this.beginsWith(fieldName, value, casing, 'OR');
+  }
   /**
    * Condition that value of field contains the specified substring
    *
@@ -182,25 +247,7 @@ class RealmQuery {
   orContains (fieldName, value, casing) {
     return this.contains(fieldName, value, casing, 'OR');
   }
-  /**
-   * Counts the number of objects that fulfill the query conditions
-   *
-   * @return {number}
-   */
-  count () {
-    let results = this.getFilteredObjects();
-    return results.length;
-  }
-  /**
-   * Returns a distinct set of objects of a specific class.
-   *
-   * @param {string} fieldName
-   * @return {any[]}
-   */
-  distinct (fieldName) {
-    let results = this.getFilteredObjects();
-    return results.map((obj) => obj[fieldName]).filter((value, index, res) => res.indexOf(value) === index);
-  }
+
 
   /**
    * Condition that the value of field ends with the specified string
@@ -249,21 +296,30 @@ class RealmQuery {
   orEqualTo (fieldName, value) {
     return this.equalTo(fieldName, value, 'OR');
   }
+
   /**
-   * Finds all objects that fulfill the query conditions
-   * @return {Realm.Results}
+   * Not-equal-to comparaison
+   *
+   * @param fieldName {string}
+   * @param value {EqualValueType}
+   * @return {RealmQuery}
    */
-  findAll () {
-    return this.getFilteredObjects();
+  notEqualTo (fieldName, value, condition = 'AND') {
+    let pos = this.addValue(value);
+    return this.addCriteria(`${fieldName} != $${pos}`, condition);
   }
+
   /**
-   * Finds the first object that fulfills the query conditions
-   * @return {Realm.Object}
+   * or Not-equal-to comparaison
+   *
+   * @param fieldName {string}
+   * @param value {EqualValueType}
+   * @return {RealmQuery}
    */
-  findFirst () {
-    let results = this.getFilteredObjects();
-    return results.length ? results[0] : /* istanbul ignore next  */ undefined;
+  orNotEqualTo (fieldName, value) {
+    return this.notEqualTo(fieldName, value, 'OR');
   }
+
   /**
    * Greater-than comparaison
    *
@@ -307,6 +363,49 @@ class RealmQuery {
    */
   orGreaterThanOrEqualTo (fieldName, value) {
     return this.greaterThanOrEqualTo (fieldName, value, 'OR');
+  }
+
+  /**
+   * Less-than comparaison
+   *
+   * @param {string} fieldName
+   * @param {CompareValueType} value
+   * @return {RealmQuery}
+   */
+  lessThan (fieldName, value, condition = 'AND') {
+    let pos = this.addValue(value);
+    return this.addCriteria(`${fieldName} < $${pos}`, condition);
+  }
+  /**
+   * or Less-than comparaison
+   *
+   * @param {string} fieldName
+   * @param {CompareValueType} value
+   * @return {RealmQuery}
+   */
+  orLessThan (fieldName, value) {
+    return this.lessThan(fieldName, value, 'OR');
+  }
+  /**
+   * Less-than-or-equal-to comparaison
+   *
+   * @param {string} fieldName
+   * @param {CompareValueType} value
+   * @return {RealmQuery}
+   */
+  lessThanOrEqualTo (fieldName, value, condition = 'AND') {
+    let pos = this.addValue(value);
+    return this.addCriteria(`${fieldName} <= $${pos}`, condition);
+  }
+  /**
+   * OR Less-than-or-equal-to comparaison
+   *
+   * @param {string} fieldName
+   * @param {CompareValueType} value
+   * @return {RealmQuery}
+   */
+  orLessThanOrEqualTo (fieldName, value) {
+    return this.lessThanOrEqualTo(fieldName, value, 'OR');
   }
   /**
    * In comparaison
@@ -352,7 +451,7 @@ class RealmQuery {
     values.forEach(cb);
     return this.addCriteria(`(${ criteria.join(' AND ') })`, condition);
   }
-  
+
   /**
    * Or not in comparaison
    *
@@ -366,7 +465,7 @@ class RealmQuery {
 
   /**
    * not null comparaison
-   * @param {string} fieldName 
+   * @param {string} fieldName
    * @returns {RealmQuery}
    */
   isNotNull (fieldName) {
@@ -374,14 +473,14 @@ class RealmQuery {
   }
   /**
    * null comparaison
-   * @param {string} fieldName 
+   * @param {string} fieldName
    * @returns {RealmQuery}
    */
   isNull (fieldName) {
     return this.addCriteria(`${fieldName} == null`, 'AND');
   }  /**
    * not null comparaison
-   * @param {string} fieldName 
+   * @param {string} fieldName
    * @returns {RealmQuery}
    */
   orIsNotNull (fieldName) {
@@ -389,54 +488,29 @@ class RealmQuery {
   }
   /**
    * null comparaison
-   * @param {string} fieldName 
+   * @param {string} fieldName
    * @returns {RealmQuery}
    */
   orIsNull (fieldName) {
     return this.addCriteria(`${fieldName} == null`, 'OR');
   }
-  /**
-   * Less-than comparaison
-   *
-   * @param {string} fieldName
-   * @param {CompareValueType} value
-   * @return {RealmQuery}
-   */
-  lessThan (fieldName, value, condition = 'AND') {
-    let pos = this.addValue(value);
-    return this.addCriteria(`${fieldName} < $${pos}`, condition);
+
+  isEmpty (fieldName) {
+    return this.addCriteria(`${fieldName} == ''`, 'AND');
   }
-  /**
-   * or Less-than comparaison
-   *
-   * @param {string} fieldName
-   * @param {CompareValueType} value
-   * @return {RealmQuery}
-   */
-  orLessThan (fieldName, value) {
-    return this.lessThan(fieldName, value, 'OR');
+
+  isNotEmpty (fieldName) {
+    return this.addCriteria(`${fieldName} == ''`, 'AND');
   }
-  /**
-   * Less-than-or-equal-to comparaison
-   *
-   * @param {string} fieldName
-   * @param {CompareValueType} value
-   * @return {RealmQuery}
-   */
-  lessThanOrEqualTo (fieldName, value, condition = 'AND') {
-    let pos = this.addValue(value);
-    return this.addCriteria(`${fieldName} <= $${pos}`, condition);
+
+  orIsEmpty (fieldName) {
+    return this.addCriteria(`${fieldName} == ''`, 'AND');
   }
-  /**
-   * OR Less-than-or-equal-to comparaison
-   *
-   * @param {string} fieldName
-   * @param {CompareValueType} value
-   * @return {RealmQuery}
-   */
-  orLessThanOrEqualTo (fieldName, value) {
-    return this.lessThanOrEqualTo(fieldName, value, 'OR');
+
+  orIsNotEmpty (fieldName) {
+    return this.addCriteria(`${fieldName} == ''`, 'AND');
   }
+
   /**
    * Like operator
    * @private
@@ -471,28 +545,7 @@ class RealmQuery {
   endNot () {
     return this.endGroup();
   }
-  /**
-   * Not-equal-to comparaison
-   *
-   * @param fieldName {string}
-   * @param value {EqualValueType}
-   * @return {RealmQuery}
-   */
-  notEqualTo (fieldName, value, condition = 'AND') {
-    let pos = this.addValue(value);
-    return this.addCriteria(`${fieldName} != $${pos}`, condition);
-  }
 
-  /**
-   * or Not-equal-to comparaison
-   *
-   * @param fieldName {string}
-   * @param value {EqualValueType}
-   * @return {RealmQuery}
-   */
-  orNotEqualTo (fieldName, value) {
-    return this.notEqualTo(fieldName, value, 'OR');
-  }
 
   /**
    * Begin AND grouping of conditions ("left parenthesis")
@@ -535,10 +588,10 @@ class RealmQuery {
 
 
   /**
-  * Group query in a callback 
+  * Group query in a callback
   * @param {groupCallback} cb
-  * @return {RealmQuery} 
-  * @example 
+  * @return {RealmQuery}
+  * @example
   * query.group((groupQuery) => {
   *   return groupQuery
   *      .equalTo('field', 10)
@@ -554,8 +607,8 @@ class RealmQuery {
   /**
   * Group query in a callback with OR operator
   * @param {groupCallback} cb
-  * @return {RealmQuery} 
-  * @example 
+  * @return {RealmQuery}
+  * @example
   * query.orGroup((groupQuery) => {
   *   return groupQuery
   *      .equalTo('field', 10)

@@ -356,7 +356,7 @@ describe('Get objects with RealmQuery', function () {
   it('should find not null', () => {
     let results = RealmQuery.query(realm.objects(Person.schema.name)).isNotNull('hobbies').findAll();
     expect(results).toHaveLength(2);
-  });  
+  });
 
   it('should find not null on nested', () => {
     let results = RealmQuery.query(realm.objects(Person.schema.name)).between('age', 33, 35).isNotNull('holidays.name').findAll();
