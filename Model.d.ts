@@ -1,18 +1,15 @@
-import RealmQuery from './query'
+import RealmQuery from './libs/query'
 
-export interface ModelItem {
+export default class Model<M> {
   delete(): void
   update(): void
-}
-
-export default class Model<ModelItem> {
-  static abstract schema: Realm.ObjectSchema
-  static all() : Realm.Results<any>
-  static searchText (term: string, limit: number): Realm.Results<any>
-  static searchText (term: string, limit: boolean): RealmQuery<any>
-  static find (id: number): any
-  static query() : RealmQuery<any>
-  static insert(object: any | any[])
+  static schema: Realm.ObjectSchema
+  static all<M>() : Realm.Results<M>
+  static searchText<M>(term: string, limit: number): Realm.Results<M>
+  static searchText<M>(term: string, limit: boolean): RealmQuery<M>
+  static find<M>(id: number): M
+  static query<M>() : RealmQuery<M>
+  static insert<M>(object: any | any[])
   static ids(): number[]
-  static delete(object: Realm.Results<any>| any ): void
+  static delete<M>(object: Realm.Results<M>| any ): void
 }
