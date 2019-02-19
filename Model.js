@@ -188,17 +188,40 @@ export default class Model extends RealmObject {
    * @param {Realm.Object} object
    * @param {any} data
    * @memberof Model
+   * @returns {Promise<void>}
    */
   static update (object, data) {
-    DB.db.write(() => merge(data, object));
+    return new Promise((resolve, reject) => {
+      try {
+        DB.db.write(() => {
+          merge(data, object);
+          resolve();
+        });
+
+      } catch (error) {
+        reject(error);
+      }
+    });
   }
   /**
    * delete results or object from database
    * @param {Realm.Results|Realm.Object} object
    * @memberof Model
+   * @returns {Promise<void>}
    */
   static delete (object) {
-    DB.db.write(() => DB.db.delete(object));
+    return new Promise((resolve, reject) => {
+      try {
+        DB.db.write(() => {
+          DB.db.delete(object);
+          resolve();
+        });
+
+      } catch (error) {
+        reject(error);
+      }
+    });
+
   }
   /**
    *
@@ -218,19 +241,21 @@ export default class Model extends RealmObject {
    * @param {any} data
    * @instance
    * @memberof Model
+   * @returns {Promise<void>}
    * @example
    * Model.update({ field: 'value'})
    */
   update (data) {
-    Model.update(this, data);
+    return Model.update(this, data);
   }
 
   /**
    * delete model
    * @instance
+   * @returns {Promise<void>}
    * @memberof Model
    */
   delete () {
-    Model.delete(this);
+    return Model.delete(this);
   }
 }
