@@ -125,7 +125,9 @@ export default class Model extends RealmObject {
    * @memberof Model
    */
   static find(id) {
-    return DB.db.objectForPrimaryKey(this.schema.name, id);
+    const obj = DB.db.objectForPrimaryKey(this.schema.name, id);
+    // return Object.assign(new this, obj);
+    return obj;
   }
 
   /**
@@ -158,14 +160,27 @@ export default class Model extends RealmObject {
    * @memberof Model
    */
   static insert(data, object) {
+    const filterModel = (obj) => {
+      const newObj = {};
+      Object.keys(obj).forEach(key => {
+        if (key != 'schema' && key != 'childModel')
+          newObj[key] = obj[key]
+      });
+      return newObj;
+    }
     return new Promise((resolve) => {
       DB.db.write(() => {
-        if (Array.isArray(data)) {
-          data.forEach(this.doInsert.bind(this));
+        if (!data[this.schema.primaryKey]) {
+          const currentId = this.query().max(this.schema.primaryKey) || 0;
+          data[this.schema.primaryKey] = currentId + 1;
+        }
+        const newData = filterModel(data);
+        if (Array.isArray(newData)) {
+          newData.forEach(this.doInsert.bind(this));
           resolve();
           return;
         }
-        this.doInsert(data, object);
+        this.doInsert(newData, object);
         resolve();
       });
     });
@@ -203,6 +218,28 @@ export default class Model extends RealmObject {
       try {
         DB.db.write(() => {
           merge(data, object);
+          resolve();
+        });
+
+      } catch (error) {
+        reject(error);
+      }
+    });
+  }
+
+  /**
+   * update object
+   * @static
+   * @param {Realm.Object} object
+   * @memberof Model
+   * @returns {Promise<void>}
+   */
+  static forceUpdate(object) {
+    return new Promise((resolve, reject) => {
+      try {
+        DB.db.write(() => {
+          console.log('hey bro', this.schema.name, object, this.hasPrimary(object));
+          DB.db.create(this.schema.name, object, this.hasPrimary(object));
           resolve();
         });
 
@@ -257,6 +294,8 @@ export default class Model extends RealmObject {
       this.childModel = childModel
     if (childSchema)
       this.schema = childSchema
+
+
   }
 
   realmTypeToJs(key) {
@@ -276,38 +315,36 @@ export default class Model extends RealmObject {
   }
 
   save() {
-    return new Promise((resolve, reject) => {
-      // iterate through instance properties to check if schema is filled
-      let error = false;
-      let hasPrimaryKey = true;
-      Object.keys(this.schema.properties).forEach(schemaKey => {
-        console.log('typeof ',schemaKey, typeof this[schemaKey])
-        const schemaValue = this.realmTypeToJs(this.schema.properties[schemaKey]);
-        if (typeof schemaValue === "object" && schemaValue.optional === true)
-          return;
-        if (Object.keys(this).findIndex(
-          instanceKey => instanceKey === schemaKey && typeof this[instanceKey] === schemaValue
-          ) === -1) {
-          if (this.schema.primaryKey === schemaKey)
-            hasPrimaryKey = false;
-          else {
-            error = true;
-            console.warn(`Property "${schemaKey}" must be set in your instance to be able to save it.`);
-          }
-        }
-      });
-      if (error) {
-        reject(`Cannot save() : some properties are missing !`);
+    // iterate through instance properties to check if schema is filled
+    let error = false;
+    let hasPrimaryKey = true;
+    Object.keys(this.schema.properties).forEach(schemaKey => {
+      console.log('typeof ',schemaKey, typeof this[schemaKey])
+      const schemaValue = this.realmTypeToJs(this.schema.properties[schemaKey]);
+      if (typeof schemaValue === "object" && schemaValue.optional === true)
         return;
-      }
-
-      if (hasPrimaryKey && this.exists()) {
-        console.log('update it');
-      } else {
-        console.log('create it');
-        return this.childModel.insert(this);
+      if (Object.keys(this).findIndex(
+        instanceKey => instanceKey === schemaKey && typeof this[instanceKey] === schemaValue
+        ) === -1) {
+        if (this.schema.primaryKey === schemaKey)
+          hasPrimaryKey = false;
+        else {
+          error = true;
+          console.warn(`Property "${schemaKey}" must be set in your instance to be able to save it.`);
+        }
       }
     });
+    if (error) {
+      return Promise.reject(`Cannot save() : some properties are missing !`);
+    }
+
+    if (hasPrimaryKey && this.exists()) {
+      console.log('update it');
+      return this.childModel.forceUpdate(this);
+    } else {
+      console.log('create it');
+      return this.childModel.insert(this);
+    }
   }
 
   exists() {
