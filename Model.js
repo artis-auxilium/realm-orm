@@ -7,14 +7,15 @@ const isNode = () => typeof process === 'object' && process + '' === '[object pr
 
 /* istanbul ignore next  */
 class FakeRealmObject {
-  isValid () {
+  isValid() {
     console.warn('isValid not available in node');
   }
 
-  objectSchema () {
+  objectSchema() {
     console.warn('objectSchema not available in node');
   }
-  linkingObjects () {
+
+  linkingObjects() {
     console.warn('linkingObjects not available in node');
   }
 }
@@ -26,6 +27,8 @@ const RealmObject = isNode() ? FakeRealmObject : /* istanbul ignore next  */ Rea
  * @class Model
  */
 export default class Model extends RealmObject {
+
+  static childModel
 
   /**
    * Model schema
@@ -72,7 +75,7 @@ export default class Model extends RealmObject {
    *   return: true
    * });
    */
-  static searchText (term, limit) {
+  static searchText(term, limit) {
     let returnQuery = limit && typeof limit === 'boolean';
     let stringFields = this.stringFields;
     if (typeof limit === 'object') {
@@ -103,13 +106,14 @@ export default class Model extends RealmObject {
     }
     return res;
   }
+
   /**
-  * get a query instance of Model
-  * @static
-  * @returns {RealmQuery}
-  * @memberof Model
-  */
-  static query () {
+   * get a query instance of Model
+   * @static
+   * @returns {RealmQuery}
+   * @memberof Model
+   */
+  static query() {
     return RealmQuery.query(this.all());
   }
 
@@ -120,7 +124,7 @@ export default class Model extends RealmObject {
    * @returns {Model}
    * @memberof Model
    */
-  static find (id) {
+  static find(id) {
     return DB.db.objectForPrimaryKey(this.schema.name, id);
   }
 
@@ -131,18 +135,20 @@ export default class Model extends RealmObject {
    * @returns {Realm.Results}
    * @memberof Model
    */
-  static all () {
+  static all() {
     return DB.db.objects(this.schema.name);
   }
+
   /**
    * Get all primaryKey of Model
    * @static
    * @returns {Array}
    * @memberof Model
    */
-  static ids () {
+  static ids() {
     return this.all().map((obj) => obj[this.schema.primaryKey]);
   }
+
   /**
    * insert new object in database
    * @static
@@ -151,24 +157,25 @@ export default class Model extends RealmObject {
    * @returns {Promise<void>}
    * @memberof Model
    */
-  static insert (data, object) {
+  static insert(data, object) {
     return new Promise((resolve) => {
       DB.db.write(() => {
         if (Array.isArray(data)) {
           data.forEach(this.doInsert.bind(this));
           resolve();
-          return ;
+          return;
         }
         this.doInsert(data, object);
         resolve();
       });
     });
   }
+
   /**
- * @private
- * @param {any} data
- */
-  static doInsert (data) {
+   * @private
+   * @param {any} data
+   */
+  static doInsert(data) {
     /* istanbul ignore next  */
     if (!data) {
       return;
@@ -182,6 +189,7 @@ export default class Model extends RealmObject {
     }
     DB.db.create(this.schema.name, data, this.hasPrimary(data));
   }
+
   /**
    * update object
    * @static
@@ -190,7 +198,7 @@ export default class Model extends RealmObject {
    * @memberof Model
    * @returns {Promise<void>}
    */
-  static update (object, data) {
+  static update(object, data) {
     return new Promise((resolve, reject) => {
       try {
         DB.db.write(() => {
@@ -203,13 +211,14 @@ export default class Model extends RealmObject {
       }
     });
   }
+
   /**
    * delete results or object from database
    * @param {Realm.Results|Realm.Object} object
    * @memberof Model
    * @returns {Promise<void>}
    */
-  static delete (object) {
+  static delete(object) {
     return new Promise((resolve, reject) => {
       try {
         DB.db.write(() => {
@@ -223,6 +232,7 @@ export default class Model extends RealmObject {
     });
 
   }
+
   /**
    *
    * @private
@@ -231,8 +241,77 @@ export default class Model extends RealmObject {
    * @returns {boolean}
    * @memberof Model
    */
-  static hasPrimary (data) {
+  static hasPrimary(data) {
     return !!this.schema.primaryKey && !!data[this.schema.primaryKey];
+  }
+
+  /** construct model
+   * @param {any} schema
+   * @instance
+   * @memberof Model
+   * @returns void
+   */
+  constructor(childModel, childSchema) {
+    super()
+    if (childModel)
+      this.childModel = childModel
+    if (childSchema)
+      this.schema = childSchema
+  }
+
+  realmTypeToJs(key) {
+    switch (key) {
+      case 'int':
+      case 'float':
+      case 'double':
+        return 'number';
+      case 'bool':
+        return 'boolean';
+      case 'data':
+      case 'date':
+        return 'object';
+      default:
+        return key;
+    }
+  }
+
+  save() {
+    return new Promise((resolve, reject) => {
+      // iterate through instance properties to check if schema is filled
+      let error = false;
+      let hasPrimaryKey = true;
+      Object.keys(this.schema.properties).forEach(schemaKey => {
+        console.log('typeof ',schemaKey, typeof this[schemaKey])
+        const schemaValue = this.realmTypeToJs(this.schema.properties[schemaKey]);
+        if (typeof schemaValue === "object" && schemaValue.optional === true)
+          return;
+        if (Object.keys(this).findIndex(
+          instanceKey => instanceKey === schemaKey && typeof this[instanceKey] === schemaValue
+          ) === -1) {
+          if (this.schema.primaryKey === schemaKey)
+            hasPrimaryKey = false;
+          else {
+            error = true;
+            console.warn(`Property "${schemaKey}" must be set in your instance to be able to save it.`);
+          }
+        }
+      });
+      if (error) {
+        reject(`Cannot save() : some properties are missing !`);
+        return;
+      }
+
+      if (hasPrimaryKey && this.exists()) {
+        console.log('update it');
+      } else {
+        console.log('create it');
+        return this.childModel.insert(this);
+      }
+    });
+  }
+
+  exists() {
+    return DB.db.objectForPrimaryKey(this.schema.name, this[this.schema.primaryKey]);
   }
 
   /**
@@ -245,7 +324,7 @@ export default class Model extends RealmObject {
    * @example
    * Model.update({ field: 'value'})
    */
-  update (data) {
+  update(data) {
     return Model.update(this, data);
   }
 
@@ -255,7 +334,7 @@ export default class Model extends RealmObject {
    * @returns {Promise<void>}
    * @memberof Model
    */
-  delete () {
+  delete() {
     return Model.delete(this);
   }
 }
