@@ -159,29 +159,16 @@ export default class Model extends RealmObject {
    * @returns {Promise<void>}
    * @memberof Model
    */
-  static insert(data, object) {
-    const filterModel = (obj) => {
-      const newObj = {};
-      Object.keys(obj).forEach(key => {
-        if (key != 'schema' && key != 'childModel')
-          newObj[key] = obj[key]
-      });
-      return newObj;
-    }
+  static insert(data) {
     return new Promise((resolve) => {
       DB.db.write(() => {
-        if (!data[this.schema.primaryKey]) {
-          const currentId = this.query().max(this.schema.primaryKey) || 0;
-          data[this.schema.primaryKey] = currentId + 1;
-        }
-        const newData = filterModel(data);
-        if (Array.isArray(newData)) {
-          newData.forEach(this.doInsert.bind(this));
-          resolve();
+        if (Array.isArray(data)) {
+          data.forEach(this.doInsert.bind(this));
+          resolve(this.all().sorted(this.schema.primaryKey, true).slice(0, data.length));
           return;
         }
-        this.doInsert(newData, object);
-        resolve();
+        this.doInsert(data);
+        resolve(this.all().sorted(this.schema.primaryKey, true).slice(0, 1)[0]);
       });
     });
   }
@@ -202,6 +189,10 @@ export default class Model extends RealmObject {
     if (typeof this.syncObject === 'function') {
       this.syncObject(data);
     }
+    if (!data[this.schema.primaryKey]) {
+      const currentId = this.query().max(this.schema.primaryKey) || 0;
+      data[this.schema.primaryKey] = currentId + 1;
+    }
     DB.db.create(this.schema.name, data, this.hasPrimary(data));
   }
 
@@ -218,7 +209,7 @@ export default class Model extends RealmObject {
       try {
         DB.db.write(() => {
           merge(data, object);
-          resolve();
+          resolve(object);
         });
 
       } catch (error) {
