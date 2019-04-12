@@ -163,12 +163,13 @@ export default class Model extends RealmObject {
     return new Promise((resolve) => {
       DB.db.write(() => {
         if (Array.isArray(data)) {
-          data.forEach(this.doInsert.bind(this));
-          resolve(this.all().sorted(this.schema.primaryKey, true).slice(0, data.length));
+          const all = data.map(row => {
+            return this.doInsert(row);
+          })
+          resolve(Promise.all(all));
           return;
         }
-        this.doInsert(data);
-        resolve(this.all().sorted(this.schema.primaryKey, true).slice(0, 1)[0]);
+        resolve(this.doInsert(data));
       });
     });
   }
@@ -178,22 +179,28 @@ export default class Model extends RealmObject {
    * @param {any} data
    */
   static doInsert(data) {
-    /* istanbul ignore next  */
-    if (!data) {
-      return;
-    }
-    if (typeof this.transform === 'function') {
-      this.transform(data);
-    }
-    /* istanbul ignore next  */
-    if (typeof this.syncObject === 'function') {
-      this.syncObject(data);
-    }
-    if (!data[this.schema.primaryKey]) {
-      const currentId = this.query().max(this.schema.primaryKey) || 0;
-      data[this.schema.primaryKey] = currentId + 1;
-    }
-    DB.db.create(this.schema.name, data, this.hasPrimary(data));
+    return new Promise((resolve) => {
+      /* istanbul ignore next  */
+      if (!data) {
+        return;
+      }
+      if (typeof this.transform === 'function') {
+        this.transform(data);
+      }
+      /* istanbul ignore next  */
+      if (typeof this.syncObject === 'function') {
+        this.syncObject(data);
+      }
+      if (!data[this.schema.primaryKey]) {
+        const currentId = this.query().max(this.schema.primaryKey) || 0;
+        data[this.schema.primaryKey] = currentId + 1;
+      }
+      DB.db.create(this.schema.name, data, this.hasPrimary(data));
+      console.log('-------------------------')
+      const all = this.all();
+      resolve(all[all.length - 1]);
+      console.log('-------------------------')
+    });
   }
 
   /**
@@ -279,67 +286,10 @@ export default class Model extends RealmObject {
    * @memberof Model
    * @returns void
    */
-  constructor(childModel, childSchema) {
+  constructor(childModel) {
     super()
     if (childModel)
       this.childModel = childModel
-    if (childSchema)
-      this.schema = childSchema
-
-
-  }
-
-  realmTypeToJs(key) {
-    switch (key) {
-      case 'int':
-      case 'float':
-      case 'double':
-        return 'number';
-      case 'bool':
-        return 'boolean';
-      case 'data':
-      case 'date':
-        return 'object';
-      default:
-        return key;
-    }
-  }
-
-  save() {
-    // iterate through instance properties to check if schema is filled
-    let error = false;
-    let hasPrimaryKey = true;
-    Object.keys(this.schema.properties).forEach(schemaKey => {
-      console.log('typeof ',schemaKey, typeof this[schemaKey])
-      const schemaValue = this.realmTypeToJs(this.schema.properties[schemaKey]);
-      if (typeof schemaValue === "object" && schemaValue.optional === true)
-        return;
-      if (Object.keys(this).findIndex(
-        instanceKey => instanceKey === schemaKey && typeof this[instanceKey] === schemaValue
-        ) === -1) {
-        if (this.schema.primaryKey === schemaKey)
-          hasPrimaryKey = false;
-        else {
-          error = true;
-          console.warn(`Property "${schemaKey}" must be set in your instance to be able to save it.`);
-        }
-      }
-    });
-    if (error) {
-      return Promise.reject(`Cannot save() : some properties are missing !`);
-    }
-
-    if (hasPrimaryKey && this.exists()) {
-      console.log('update it');
-      return this.childModel.forceUpdate(this);
-    } else {
-      console.log('create it');
-      return this.childModel.insert(this);
-    }
-  }
-
-  exists() {
-    return DB.db.objectForPrimaryKey(this.schema.name, this[this.schema.primaryKey]);
   }
 
   /**
