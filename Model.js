@@ -7,15 +7,15 @@ const isNode = () => typeof process === 'object' && process + '' === '[object pr
 
 /* istanbul ignore next  */
 class FakeRealmObject {
-  isValid() {
+  isValid () {
     console.warn('isValid not available in node');
   }
 
-  objectSchema() {
+  objectSchema () {
     console.warn('objectSchema not available in node');
   }
 
-  linkingObjects() {
+  linkingObjects () {
     console.warn('linkingObjects not available in node');
   }
 }
@@ -27,8 +27,6 @@ const RealmObject = isNode() ? FakeRealmObject : /* istanbul ignore next  */ Rea
  * @class Model
  */
 export default class Model extends RealmObject {
-
-  static childModel
 
   /**
    * Model schema
@@ -75,7 +73,7 @@ export default class Model extends RealmObject {
    *   return: true
    * });
    */
-  static searchText(term, limit) {
+  static searchText (term, limit) {
     let returnQuery = limit && typeof limit === 'boolean';
     let stringFields = this.stringFields;
     if (typeof limit === 'object') {
@@ -108,12 +106,12 @@ export default class Model extends RealmObject {
   }
 
   /**
-   * get a query instance of Model
-   * @static
-   * @returns {RealmQuery}
-   * @memberof Model
-   */
-  static query() {
+  * get a query instance of Model
+  * @static
+  * @returns {RealmQuery}
+  * @memberof Model
+  */
+  static query () {
     return RealmQuery.query(this.all());
   }
 
@@ -124,10 +122,8 @@ export default class Model extends RealmObject {
    * @returns {Model}
    * @memberof Model
    */
-  static find(id) {
-    const obj = DB.db.objectForPrimaryKey(this.schema.name, id);
-    // return Object.assign(new this, obj);
-    return obj;
+  static find (id) {
+    return DB.db.objectForPrimaryKey(this.schema.name, id);
   }
 
   /**
@@ -137,7 +133,7 @@ export default class Model extends RealmObject {
    * @returns {Realm.Results}
    * @memberof Model
    */
-  static all() {
+  static all () {
     return DB.db.objects(this.schema.name);
   }
 
@@ -147,7 +143,7 @@ export default class Model extends RealmObject {
    * @returns {Array}
    * @memberof Model
    */
-  static ids() {
+  static ids () {
     return this.all().map((obj) => obj[this.schema.primaryKey]);
   }
 
@@ -159,7 +155,7 @@ export default class Model extends RealmObject {
    * @returns {Promise<void>}
    * @memberof Model
    */
-  static insert(data) {
+  static insert (data) {
     return new Promise((resolve) => {
       DB.db.write(() => {
         if (Array.isArray(data)) {
@@ -196,10 +192,8 @@ export default class Model extends RealmObject {
         data[this.schema.primaryKey] = currentId + 1;
       }
       DB.db.create(this.schema.name, data, this.hasPrimary(data));
-      console.log('-------------------------')
       const all = this.all();
       resolve(all[all.length - 1]);
-      console.log('-------------------------')
     });
   }
 
@@ -211,7 +205,7 @@ export default class Model extends RealmObject {
    * @memberof Model
    * @returns {Promise<void>}
    */
-  static update(object, data) {
+  static update (object, data) {
     return new Promise((resolve, reject) => {
       try {
         DB.db.write(() => {
@@ -226,7 +220,7 @@ export default class Model extends RealmObject {
   }
 
   /**
-   * update object
+   * force update object when realm doesn't detect changes
    * @static
    * @param {Realm.Object} object
    * @memberof Model
@@ -236,7 +230,6 @@ export default class Model extends RealmObject {
     return new Promise((resolve, reject) => {
       try {
         DB.db.write(() => {
-          console.log('hey bro', this.schema.name, object, this.hasPrimary(object));
           DB.db.create(this.schema.name, object, this.hasPrimary(object));
           resolve();
         });
@@ -253,7 +246,7 @@ export default class Model extends RealmObject {
    * @memberof Model
    * @returns {Promise<void>}
    */
-  static delete(object) {
+  static delete (object) {
     return new Promise((resolve, reject) => {
       try {
         DB.db.write(() => {
@@ -276,20 +269,8 @@ export default class Model extends RealmObject {
    * @returns {boolean}
    * @memberof Model
    */
-  static hasPrimary(data) {
+  static hasPrimary (data) {
     return !!this.schema.primaryKey && !!data[this.schema.primaryKey];
-  }
-
-  /** construct model
-   * @param {any} schema
-   * @instance
-   * @memberof Model
-   * @returns void
-   */
-  constructor(childModel) {
-    super()
-    if (childModel)
-      this.childModel = childModel
   }
 
   /**
@@ -302,7 +283,7 @@ export default class Model extends RealmObject {
    * @example
    * Model.update({ field: 'value'})
    */
-  update(data) {
+  update (data) {
     return Model.update(this, data);
   }
 
@@ -312,7 +293,7 @@ export default class Model extends RealmObject {
    * @returns {Promise<void>}
    * @memberof Model
    */
-  delete() {
+  delete () {
     return Model.delete(this);
   }
 }
