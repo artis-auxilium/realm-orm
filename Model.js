@@ -156,17 +156,19 @@ export default class Model extends RealmObject {
    * @memberof Model
    */
   static insert (data) {
-    return new Promise((resolve) => {
-      DB.db.write(() => {
+    return new Promise(async (resolve) => {
         if (Array.isArray(data)) {
-          const all = data.map(row => {
-            return this.doInsert(row);
-          })
-          resolve(Promise.all(all));
+          const results = []
+          for (const row of data) {
+            DB.db.write(async () => {
+              const obj = await this.doInsert(row);
+              results.push(obj)
+            });
+          }
+          resolve(results);
           return;
         }
         resolve(this.doInsert(data));
-      });
     });
   }
 
@@ -192,8 +194,13 @@ export default class Model extends RealmObject {
         data[this.schema.primaryKey] = currentId + 1;
       }
       DB.db.create(this.schema.name, data, this.hasPrimary(data));
-      const all = this.all();
-      resolve(all[all.length - 1]);
+      const alreadyExisted = this.find(data[this.schema.primaryKey]);
+      if (alreadyExisted) {
+        resolve(alreadyExisted);
+      } else {
+        const all = this.all();
+        resolve(all[all.length - 1]);
+      }
     });
   }
 
