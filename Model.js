@@ -168,7 +168,10 @@ export default class Model extends RealmObject {
           resolve(results);
           return;
         }
-        resolve(this.doInsert(data));
+      DB.db.write(async () => {
+        const obj = await this.doInsert(data)
+        resolve(obj);
+      });
     });
   }
 
