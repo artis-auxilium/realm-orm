@@ -537,15 +537,15 @@ class RealmQuery {
   }
 
   isNotEmpty (fieldName) {
-    return this.addCriteria(`${fieldName} == ''`, 'AND');
+    return this.addCriteria(`${fieldName} != ''`, 'AND');
   }
 
   orIsEmpty (fieldName) {
-    return this.addCriteria(`${fieldName} == ''`, 'AND');
+    return this.addCriteria(`${fieldName} == ''`, 'OR');
   }
 
   orIsNotEmpty (fieldName) {
-    return this.addCriteria(`${fieldName} == ''`, 'AND');
+    return this.addCriteria(`${fieldName} != ''`, 'OR');
   }
 
   /**
