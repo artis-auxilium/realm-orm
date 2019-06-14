@@ -12,4 +12,5 @@ export default class Model<M> {
   static insert<M>(object: any | any[])
   static ids(): number[]
   static delete<M>(object: Realm.Results<M>| any ): void
+  static create<M>(object: any | any[]): Promise<M> | Promise<M[]>
 }

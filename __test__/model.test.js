@@ -2,6 +2,7 @@ import RealmQuery from '../libs/query';
 import Person from './models/Person';
 import TPerson from './models/TPerson';
 import Holiday from './models/Holiday';
+import CPerson from './models/CPerson';
 import DB from '../';
 
 describe('Model', () => {
@@ -12,7 +13,8 @@ describe('Model', () => {
       schema: [
         Holiday,
         Person,
-        TPerson
+        TPerson,
+        CPerson,
       ]
     });
     db.open().then((db) => {
@@ -58,6 +60,7 @@ describe('Model', () => {
     expect(person.name).toEqual('new value');
     person.update({ name: 'first person' });
     expect(person.name).toEqual('first person');
+    expect(person.update({ name: null })).rejects.toMatchSnapshot();
   });
 
   it('should delete model', () => {
@@ -80,11 +83,51 @@ describe('Model', () => {
     Person.delete(person);
     person = Person.find(123656);
     expect(person).toBeFalsy();
-
+    expect(Person.delete({})).rejects.toMatchSnapshot();
   });
 
   it('should get ids', () => {
     expect(Person.ids()).toHaveLength(3);
+  });
+
+  it('Should create and return object created without primary key', () => {
+    TPerson.create({
+      id: 15478,
+      name: 'third person',
+      age: 96,
+      createdAt: new Date(),
+    }).then((object) =>{
+      expect(object.name).toEqual('third person');
+      expect(object).toBeDefined();
+    });
+  });
+  it('Should create and return object created with primary key', () => {
+    CPerson.create({
+      name: 'third person',
+      age: 96,
+      createdAt: new Date(),
+    }).then((object) =>{
+      expect(object.name).toEqual('third person');
+      expect(object).toBeDefined();
+    });
+  });
+
+  it('Should create and return  array of object created without primary key', () => {
+    CPerson.create([
+      {
+        name: 'third person',
+        age: 96,
+        createdAt: new Date(),
+      },
+      {
+        name: 'other person',
+        age: 97,
+        createdAt: new Date(),
+      }
+    ]).then((objects) =>{
+      expect(objects).toHaveLength(2);
+      expect(objects.map(obj => obj.name).join(', ')).toEqual('third person, other person');
+    });
   });
 
   it('should transform on insert', () => {

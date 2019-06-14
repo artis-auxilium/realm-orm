@@ -85,9 +85,13 @@ get a record
 
 ```js
 person = Person.find(1)
-// update person
+```
+update person
+```js
 person.update({ age: 10 })
-// delete person
+```
+delete person
+```js
 person.delete()
 // or
 Person.delete(person)

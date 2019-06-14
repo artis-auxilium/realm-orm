@@ -182,6 +182,61 @@ export default class Model extends RealmObject {
     }
     DB.db.create(this.schema.name, data, this.hasPrimary(data));
   }
+
+  /**
+   * insert new object in database and return object
+   * @static
+   * @param {array|any} data
+   *
+   * @returns {Promise<Model|Model[]>}
+   * @memberof Model
+   */
+  static create (data) {
+    return new Promise((resolve) => {
+      if (Array.isArray(data)) {
+        DB.db.write(() => {
+          const results  = data.map(this.doCreate.bind(this));
+          resolve(results);
+        });
+        return;
+      }
+      DB.db.write(() => {
+        resolve(this.doCreate(data));
+      });
+    });
+  }
+
+  /**
+   * @private
+   * @param {any} data
+   */
+  static doCreate(data) {
+    /* istanbul ignore next  */
+    if (!data) {
+      return;
+    }
+    if (typeof this.transform === 'function') {
+      this.transform(data);
+    }
+    /* istanbul ignore next  */
+    if (typeof this.syncObject === 'function') {
+      this.syncObject(data);
+    }
+    let hasPrimary = this.hasPrimary(data);
+    DB.db.create(this.schema.name, data, hasPrimary);
+    let alreadyExisted;
+    if (hasPrimary) {
+      alreadyExisted = this.find(data[this.schema.primaryKey]);
+    }
+    if (alreadyExisted) {
+      return alreadyExisted;
+    } else {
+      const all = this.all();
+      return all[all.length - 1];
+    }
+  }
+
+
   /**
    * update object
    * @static

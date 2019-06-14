@@ -1,0 +1,5 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Model should delete model 1`] = `[Error: Argument to 'delete' must be a Realm object or a collection of Realm objects.]`;
+
+exports[`Model should update property 1`] = `[Error: Person.name must be of type 'string', got 'null' (null)]`;

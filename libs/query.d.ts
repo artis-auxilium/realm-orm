@@ -3,6 +3,11 @@ import { Results } from 'realm';
 export declare type ILogicOperator = 'AND' | 'OR';
 export declare type EqualValueType = string | number | boolean | Date;
 export declare type CompareValueType = number | Date;
+type keyOfType<T, KT> = { [K in keyof T]: T[K] extends KT ? K : never }[keyof T];
+type keyOfCompareValueType<T> = keyOfType<T, CompareValueType>
+type keyOfEqualValueType<T> = keyOfType<T, EqualValueType>
+type keyOfStringType<T> = keyOfType<T, string>
+type keyOfNumberType<T> = keyOfType<T, number>;
 declare type groupCallback = (cb: RealmQuery<any>) => RealmQuery<any>
 declare class RealmQuery<M> {
     private objects;
@@ -16,7 +21,7 @@ declare class RealmQuery<M> {
      * @param fieldName {string}
      * @return {number}
      */
-    avg (fieldName: keyof M): number;
+    avg (fieldName: keyOfNumberType<M>): number;
     /**
    * select distinct element
    *
@@ -51,7 +56,7 @@ declare class RealmQuery<M> {
     * Only supported for int, float, double and date properties.
     * null values are ignored entirely by this method and will not be returned.
     */
-    max(fieldName: keyof M): number;
+    max<T extends keyOfCompareValueType<M>>(fieldName: T): M[T];
 
     /**
     * Returns the minimum value of the values in the collection or of the given property
@@ -59,17 +64,17 @@ declare class RealmQuery<M> {
     * Only supported for int, float, double and date properties.
     * null values are ignored entirely by this method and will not be returned
     */
-    min(fieldName: keyof M): M[keyof M];
+    min<T extends keyOfCompareValueType<M>>(fieldName: T): M[T];
 
     /**
      * Calculates the sum of a given field
      */
-    sum(fieldName: keyof M): number;
+    sum(fieldName: keyOfNumberType<M>): number;
 
     /**
      * Calculates the average of a given field
      */
-    avg(fieldName: keyof M): number;
+    avg(fieldName: keyOfNumberType<M>): number;
 
     /**
      * Counts the number of objects that fulfill the query conditions
@@ -86,7 +91,7 @@ declare class RealmQuery<M> {
      * @param to {CompareValueType}
      * @return {RealmQuery}
      */
-    between(fieldName: keyof M, from: CompareValueType, to: CompareValueType): RealmQuery<M>;
+    between(fieldName: keyOfCompareValueType<M>, from: CompareValueType, to: CompareValueType): RealmQuery<M>;
     orBetween(fieldName: keyof M, from: CompareValueType, to: CompareValueType): RealmQuery<M>;
 
     /**
@@ -96,8 +101,8 @@ declare class RealmQuery<M> {
      * @param value {string}
      * @param casing {boolean, optional} BEGINSWITH[c] or BEGINSWITH
      */
-    beginsWith(fieldName: keyof M, value: string, casing?: boolean): RealmQuery<M>;
-    orBeginsWith(fieldName: keyof M, value: string, casing?: boolean): RealmQuery<M>;
+    beginsWith(fieldName: keyOfStringType<M>, value: string, casing?: boolean): RealmQuery<M>;
+    orBeginsWith(fieldName: keyOfStringType<M>, value: string, casing?: boolean): RealmQuery<M>;
 
     /**
      * Condition that value of field contains the specified substring
@@ -106,7 +111,7 @@ declare class RealmQuery<M> {
      * @param value {string}
      * @param casing {boolean, optional} CONTAINS[c] or CONTAINS
      */
-    contains(fieldName: keyof M, value: string, casing?: boolean): RealmQuery<M>;
+    contains(fieldName: keyOfStringType<M>, value: string, casing?: boolean): RealmQuery<M>;
     /**
      * or Condition that value of field contains the specified substring
      *
@@ -114,7 +119,7 @@ declare class RealmQuery<M> {
      * @param value {string}
      * @param casing {boolean, optional} CONTAINS[c] or CONTAINS
      */
-    orContains(fieldName: keyof M, value: string, casing?: boolean): RealmQuery<M>;
+    orContains(fieldName: keyOfStringType<M>, value: string, casing?: boolean): RealmQuery<M>;
 
     /**
      * Condition that the value of field ends with the specified string
@@ -124,7 +129,7 @@ declare class RealmQuery<M> {
      * @param casing {boolean, optional} ENDSWITH[c] or ENDSWITH
      * @return {RealmQuery}
      */
-    endsWith(fieldName: keyof M, value: string, casing?: boolean): RealmQuery<M>;
+    endsWith(fieldName: keyOfStringType<M>, value: string, casing?: boolean): RealmQuery<M>;
     /**
      * OR Condition that the value of field ends with the specified string
      *
@@ -133,7 +138,7 @@ declare class RealmQuery<M> {
      * @param casing {boolean, optional} ENDSWITH[c] or ENDSWITH
      * @return {RealmQuery}
      */
-    orEndsWith(fieldName: keyof M, value: string, casing?: boolean): RealmQuery<M>;
+    orEndsWith(fieldName: keyOfStringType<M>, value: string, casing?: boolean): RealmQuery<M>;
     /**
      * Equal-to comparison
      *
@@ -141,7 +146,7 @@ declare class RealmQuery<M> {
      * @param value {EqualValueType}
      * @return {RealmQuery}
      */
-    equalTo(fieldName: keyof M, value: EqualValueType): RealmQuery<M>;
+    equalTo(fieldName: keyOfEqualValueType<M>, value: EqualValueType): RealmQuery<M>;
     /**
      * or-equal-to comparison
      *
@@ -149,7 +154,7 @@ declare class RealmQuery<M> {
      * @param value {EqualValueType}
      * @return {RealmQuery}
      */
-    orEqualTo(fieldName: keyof M, value: EqualValueType): RealmQuery<M>;
+    orEqualTo(fieldName: keyOfEqualValueType<M>, value: EqualValueType): RealmQuery<M>;
 
     /**
      * Not-equal-to comparison
@@ -158,7 +163,7 @@ declare class RealmQuery<M> {
      * @param value {EqualValueType}
      * @return {RealmQuery}
      */
-    notEqualTo(fieldName: keyof M, value: EqualValueType): RealmQuery<M>;
+    notEqualTo(fieldName: keyOfEqualValueType<M>, value: EqualValueType): RealmQuery<M>;
 
     /**
      * OR Equal-to comparison
@@ -167,7 +172,7 @@ declare class RealmQuery<M> {
      * @param value {EqualValueType}
      * @return {RealmQuery}
      */
-    orNotEqualTo(fieldName: keyof M, value: EqualValueType): RealmQuery<M>;
+    orNotEqualTo(fieldName: keyOfEqualValueType<M>, value: EqualValueType): RealmQuery<M>;
 
 
     /**
@@ -177,7 +182,7 @@ declare class RealmQuery<M> {
      * @param value {CompareValueType}
      * @return {RealmQuery}
      */
-    greaterThan(fieldName: keyof M, value: CompareValueType): RealmQuery<M>;
+    greaterThan(fieldName: keyOfCompareValueType<M>, value: CompareValueType): RealmQuery<M>;
     /**
      * or Greater-than comparison
      *
@@ -185,7 +190,7 @@ declare class RealmQuery<M> {
      * @param value {CompareValueType}
      * @return {RealmQuery}
      */
-    orGreaterThan(fieldName: keyof M, value: CompareValueType): RealmQuery<M>;
+    orGreaterThan(fieldName: keyOfCompareValueType<M>, value: CompareValueType): RealmQuery<M>;
     /**
      * greater-than-or-equal-to comparison
      *
@@ -193,7 +198,7 @@ declare class RealmQuery<M> {
      * @param value {CompareValueType}
      * @return {RealmQuery}
      */
-    greaterThanOrEqualTo(fieldName: keyof M, value: CompareValueType): RealmQuery<M>;
+    greaterThanOrEqualTo(fieldName: keyOfCompareValueType<M>, value: CompareValueType): RealmQuery<M>;
     /**
      * or greater-than-or-equal-to comparison
      *
@@ -201,7 +206,7 @@ declare class RealmQuery<M> {
      * @param value {CompareValueType}
      * @return {RealmQuery}
      */
-    orGreaterThanOrEqualTo(fieldName: keyof M, value: CompareValueType): RealmQuery<M>;
+    orGreaterThanOrEqualTo(fieldName: keyOfCompareValueType<M>, value: CompareValueType): RealmQuery<M>;
     /**
      * Less-than comparison
      *
@@ -209,7 +214,7 @@ declare class RealmQuery<M> {
      * @param value {CompareValueType}
      * @return {RealmQuery}
      */
-    lessThan(fieldName: keyof M, value: CompareValueType): RealmQuery<M>;
+    lessThan(fieldName: keyOfCompareValueType<M>, value: CompareValueType): RealmQuery<M>;
     /**
      * Or Less-than comparison
      *
@@ -217,7 +222,7 @@ declare class RealmQuery<M> {
      * @param value {CompareValueType}
      * @return {RealmQuery}
      */
-    orLessThan(fieldName: keyof M, value: CompareValueType): RealmQuery<M>;
+    orLessThan(fieldName: keyOfCompareValueType<M>, value: CompareValueType): RealmQuery<M>;
     /**
      * Less-than-or-equal-to comparison
      *
@@ -225,7 +230,7 @@ declare class RealmQuery<M> {
      * @param value {CompareValueType}
      * @return {RealmQuery}
      */
-    lessThanOrEqualTo(fieldName: keyof M, value: CompareValueType): RealmQuery<M>;
+    lessThanOrEqualTo(fieldName: keyOfCompareValueType<M>, value: CompareValueType): RealmQuery<M>;
     /**
      * OR Less-than-or-equal-to comparison
      *
@@ -233,7 +238,7 @@ declare class RealmQuery<M> {
      * @param value {CompareValueType}
      * @return {RealmQuery}
      */
-    orLessThanOrEqualTo(fieldName: keyof M, value: CompareValueType): RealmQuery<M>;
+    orLessThanOrEqualTo(fieldName: keyOfCompareValueType<M>, value: CompareValueType): RealmQuery<M>;
     /**
      * In comparison
      *
@@ -241,14 +246,14 @@ declare class RealmQuery<M> {
      * @param values {EqualValueType[]}
      * @return {RealmQuery}
      */
-    in(fieldName: keyof M, values: EqualValueType[]): RealmQuery<M>;
-    orIn(fieldName: keyof M, values: EqualValueType[]): RealmQuery<M>;
-    notIn(fieldName: keyof M, values: EqualValueType[]): RealmQuery<M>;
-    orNotIn(fieldName: keyof M, values: EqualValueType[]): RealmQuery<M>;
-    isEmpty(fieldName: keyof M): RealmQuery<M>;
-    isNotEmpty(fieldName: keyof M): RealmQuery<M>;
-    orIsEmpty(fieldName: keyof M): RealmQuery<M>;
-    orIsNotEmpty(fieldName: keyof M): RealmQuery<M>;
+    in(fieldName: keyOfEqualValueType<M>, values: EqualValueType[]): RealmQuery<M>;
+    orIn(fieldName: keyOfEqualValueType<M>, values: EqualValueType[]): RealmQuery<M>;
+    notIn(fieldName: keyOfEqualValueType<M>, values: EqualValueType[]): RealmQuery<M>;
+    orNotIn(fieldName: keyOfEqualValueType<M>, values: EqualValueType[]): RealmQuery<M>;
+    isEmpty(fieldName: keyOfStringType<M>): RealmQuery<M>;
+    isNotEmpty(fieldName: keyOfStringType<M>): RealmQuery<M>;
+    orIsEmpty(fieldName: keyOfStringType<M>): RealmQuery<M>;
+    orIsNotEmpty(fieldName: keyOfStringType<M>): RealmQuery<M>;
     isNotNull(fieldName: keyof M): RealmQuery<M>;
     orIsNotNull(fieldName: keyof M): RealmQuery<M>;
     isNull(fieldName: keyof M): RealmQuery<M>;
@@ -258,13 +263,13 @@ declare class RealmQuery<M> {
      * @param fieldName
      * @param value
      */
-    like(fieldName: keyof M, value: string): RealmQuery<M>;
+    like(fieldName: keyOfStringType<M>, value: string): RealmQuery<M>;
     /**
      *
      * @param fieldName
      * @param value
      */
-    orLike(fieldName: keyof M, value: string): RealmQuery<M>;
+    orLike(fieldName: keyOfStringType<M>, value: string): RealmQuery<M>;
 
     not(): RealmQuery<M>;
     endNot(): RealmQuery<M>;
