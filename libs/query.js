@@ -63,6 +63,10 @@ class RealmQuery {
   }
 
   addValue (value) {
+    let index;
+    if ((index = this.values.indexOf(value)) > -1) {
+      return index;
+    }
     this.values.push(value);
     return this.values.length -1;
   }
