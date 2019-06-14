@@ -4,8 +4,8 @@
 
 * [Model](#Model)
     * _instance_
-        * [.update(data)](#Model+update)
-        * [.delete()](#Model+delete)
+        * [.update(data)](#Model+update) ⇒ <code>Promise.&lt;void&gt;</code>
+        * [.delete()](#Model+delete) ⇒ <code>Promise.&lt;void&gt;</code>
     * _static_
         * *[.schema](#Model.schema) : <code>Realm.ObjectSchema</code>*
         * *[.stringFields](#Model.stringFields) : <code>Array.&lt;string&gt;</code>*
@@ -15,14 +15,15 @@
         * [.all()](#Model.all) ⇒ <code>Realm.Results</code>
         * [.ids()](#Model.ids) ⇒ <code>Array</code>
         * [.insert(data)](#Model.insert) ⇒ <code>Promise.&lt;void&gt;</code>
-        * [.update(object, data)](#Model.update)
-        * [.delete(object)](#Model.delete)
+        * [.create(data)](#Model.create) ⇒ <code>Promise.&lt;(Model\|Array.&lt;Model&gt;)&gt;</code>
+        * [.update(object, data)](#Model.update) ⇒ <code>Promise.&lt;void&gt;</code>
+        * [.delete(object)](#Model.delete) ⇒ <code>Promise.&lt;void&gt;</code>
 
 * * *
 
 <a name="Model+update"></a>
 
-### model.update(data)
+### model.update(data) ⇒ <code>Promise.&lt;void&gt;</code>
 update model
 
 **Kind**: instance method of [<code>Model</code>](#Model)
@@ -40,7 +41,7 @@ Model.update({ field: 'value'})
 
 <a name="Model+delete"></a>
 
-### model.delete()
+### model.delete() ⇒ <code>Promise.&lt;void&gt;</code>
 delete model
 
 **Kind**: instance method of [<code>Model</code>](#Model)
@@ -144,13 +145,21 @@ insert new object in database
 | Param | Type |
 | --- | --- |
 | data | <code>array</code> \| <code>any</code> |
-
-
 * * *
+<a name="Model.create"></a>
 
+### Model.create(data) ⇒ <code>Promise.&lt;(Model\|Array.&lt;Model&gt;)&gt;</code>
+insert new object in database and return object
+
+**Kind**: static method of [<code>Model</code>](#Model)
+
+| Param | Type |
+| --- | --- |
+| data | <code>array</code> \| <code>any</code> |
+* * *
 <a name="Model.update"></a>
 
-### Model.update(object, data)
+### Model.update(object, data) ⇒ <code>Promise.&lt;void&gt;</code>
 update object
 
 **Kind**: static method of [<code>Model</code>](#Model)
@@ -165,7 +174,7 @@ update object
 
 <a name="Model.delete"></a>
 
-### Model.delete(object)
+### Model.delete(object) ⇒ <code>Promise.&lt;void&gt;</code>
 delete results or object from database
 
 **Kind**: static method of [<code>Model</code>](#Model)
