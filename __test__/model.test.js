@@ -4,7 +4,7 @@ import TPerson from './models/TPerson';
 import Holiday from './models/Holiday';
 import CPerson from './models/CPerson';
 import DB from '../';
-
+const PERSON_ID = 123;
 describe('Model', () => {
   beforeAll(() => {
     let db = new DB({
@@ -44,10 +44,9 @@ describe('Model', () => {
       }]);
     });
   });
-  let person;
   it('should find primary', () => {
-    person = Person.find(123);
-    expect(person.id).toEqual(123);
+    let person = Person.find(PERSON_ID);
+    expect(person.id).toEqual(PERSON_ID);
   });
 
   it('should have query', () => {
@@ -56,6 +55,7 @@ describe('Model', () => {
   });
 
   it('should update property', () => {
+    let person = Person.find(PERSON_ID);
     person.update({ name: 'new value' });
     expect(person.name).toEqual('new value');
     person.update({ name: 'first person' });

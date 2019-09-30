@@ -1,16 +1,27 @@
 import RealmQuery from './libs/query'
+import * as Realm from 'realm'
 
-export default class Model<M> {
-  delete(): void
-  update(): void
-  static schema: Realm.ObjectSchema
-  static all<M>() : Realm.Results<M>
-  static searchText<M>(term: string, limit: number): Realm.Results<M>
-  static searchText<M>(term: string, limit: boolean): RealmQuery<M>
-  static find<M>(id: number): M
-  static query<M>() : RealmQuery<M>
-  static insert<M>(object: any | any[])
-  static ids(): number[]
-  static delete<M>(object: Realm.Results<M>| any ): void
-  static create<M>(object: any | any[]): Promise<M> | Promise<M[]>
+interface SearchOption  {
+  stringFields?: string[]
+  return?: boolean,
+  limit?: number,
+}
+
+export interface ModelStatic<M> {
+  schema: Realm.ObjectSchema
+  all() : Realm.Results<M & Realm.Object>
+  searchText(term: string, limit?: number): Realm.Results<M & Realm.Object>
+  searchText(term: string, limit?: boolean): RealmQuery<M>
+  searchText(term: string, options: SearchOption): Realm.Results<M & Realm.Object> | RealmQuery<M>
+  find(id: number): M & Realm.Object
+  query() : RealmQuery<M>
+  insert(object: any | any[]): Promise<void>
+  ids(): number[]
+  delete(object: Realm.Results<M>| any ): Promise<void>
+}
+type NonFunctionPropertyNames<T> = { [K in keyof T]: T[K] extends Function ? never : K }[keyof Partial<T>];
+type NonFunctionProperties<T> = Pick<Partial<T>, NonFunctionPropertyNames<T>>;
+export default class Model<M extends Realm.Object> {
+  delete(): Promise<void>
+  update(object : NonFunctionProperties<M>): Promise<void>
 }

@@ -112,6 +112,10 @@ _For more examples and usage, please refer to the doc._
 * [model api](./docs/model.md)
 * [query api](./docs/query.md)
 
+## Typescript
+see [person](https://github.com/artis-auxilium/realm-orm/blob/master/__test__/models/Person.d.ts) definition in test file
+
+
 ## Stuff used to make this
 
 * [Realm-query](https://github.com/mrphu3074/realm-query): starting point of query builder
