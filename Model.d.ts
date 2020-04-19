@@ -13,9 +13,10 @@ export interface ModelStatic<M> {
   searchText(term: string, limit?: number): Realm.Results<M & Realm.Object>
   searchText(term: string, limit?: boolean): RealmQuery<M>
   searchText(term: string, options: SearchOption): Realm.Results<M & Realm.Object> | RealmQuery<M>
-  find(id: number): M & Realm.Object
+  find(id: number|string): M & Realm.Object
   query() : RealmQuery<M>
-  insert(object: any | any[]): Promise<void>
+  insert(object: NonFunctionProperties<M> | NonFunctionProperties<M>[]): Promise<void>
+  create(object: NonFunctionProperties<M> | NonFunctionProperties<M>[]): Promise<M>
   ids(): number[]
   delete(object: Realm.Results<M>| any ): Promise<void>
 }

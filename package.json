@@ -12,7 +12,7 @@
   },
   "typings": "./index.d.ts",
   "peerDependencies": {
-    "realm": "^2.18.0"
+    "realm": "^5.0"
   },
   "dependencies": {},
   "jest": {
@@ -37,6 +37,6 @@
     "@babel/preset-env": "^7.6.2",
     "babel-jest": "^24.9.0",
     "jest": "^24.9.0",
-    "realm": "^3.1.0"
+    "realm": "^5.0"
   }
 }

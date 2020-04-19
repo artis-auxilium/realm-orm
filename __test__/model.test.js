@@ -26,21 +26,21 @@ describe('Model', () => {
         name: 'first person',
         age: 34,
         hobbies: 'dev',
-        createdAt: new Date('2011-09-26 16:42:17')
+        createdAt: new Date('2011-09-26 16:42:17').toISOString()
       },
       {
         id: 124,
         name: 'other person',
         age: 34,
         hobbies: 'dev',
-        createdAt: new Date('2011-09-26 16:42:17')
+        createdAt: new Date('2011-09-26 16:42:17').toISOString()
       },
       {
         id: 125,
         name: 'nobody person',
         age: 34,
         hobbies: 'dev',
-        createdAt: new Date('2011-09-26 16:42:17')
+        createdAt: new Date('2011-09-26 16:42:17').toISOString()
       }]);
     });
   });
@@ -68,12 +68,12 @@ describe('Model', () => {
       id: 123655,
       name: 'second person',
       age: 16,
-      createdAt: new Date(),
+      createdAt: new Date().toISOString(),
     }, {
       id: 123656,
       name: 'third person',
       age: 96,
-      createdAt: new Date(),
+      createdAt: new Date().toISOString(),
     }]);
     let person = Person.find(123655);
     person.delete();
@@ -95,7 +95,7 @@ describe('Model', () => {
       id: 15478,
       name: 'third person',
       age: 96,
-      createdAt: new Date(),
+      createdAt: new Date().toISOString(),
     }).then((object) =>{
       expect(object.name).toEqual('third person');
       expect(object).toBeDefined();
@@ -105,7 +105,7 @@ describe('Model', () => {
     CPerson.create({
       name: 'third person',
       age: 96,
-      createdAt: new Date(),
+      createdAt: new Date().toISOString(),
     }).then((object) =>{
       expect(object.name).toEqual('third person');
       expect(object).toBeDefined();
@@ -117,12 +117,12 @@ describe('Model', () => {
       {
         name: 'third person',
         age: 96,
-        createdAt: new Date(),
+        createdAt: new Date().toISOString(),
       },
       {
         name: 'other person',
         age: 97,
-        createdAt: new Date(),
+        createdAt: new Date().toISOString(),
       }
     ]).then((objects) =>{
       expect(objects).toHaveLength(2);
@@ -135,7 +135,7 @@ describe('Model', () => {
       id: 321654,
       name: 'third person',
       age: 96,
-      createdAt: new Date(),
+      createdAt: new Date().toISOString(),
     });
     let person = TPerson.find(321654);
     expect(person.age).toEqual(355);
