@@ -1,6 +1,6 @@
 {
   "name": "realm-orm",
-  "version": "1.0.7",
+  "version": "2.0.0",
   "main": "index.js",
   "license": "MIT",
   "repository": {
@@ -12,7 +12,7 @@
   },
   "typings": "./index.d.ts",
   "peerDependencies": {
-    "realm": "^2.18.0"
+    "realm": "^5.0"
   },
   "dependencies": {},
   "jest": {
@@ -37,6 +37,6 @@
     "@babel/preset-env": "^7.6.2",
     "babel-jest": "^24.9.0",
     "jest": "^24.9.0",
-    "realm": "^3.1.0"
+    "realm": "^5.0"
   }
 }

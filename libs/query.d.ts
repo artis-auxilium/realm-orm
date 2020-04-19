@@ -42,13 +42,13 @@ declare class RealmQuery<M> {
      * Finds all objects that fulfill the query conditions
      * @return {Results}
      */
-    findAll(): Results<M>;
+    findAll(): Results<M & Realm.Object>;
 
 
     /**
      * Finds the first object that fulfills the query conditions
      */
-    findFirst(): M;
+    findFirst(): M & Realm.Object;
 
     /**
     * Returns the maximum value of the values in the collection or of the given property
