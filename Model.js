@@ -6,7 +6,7 @@ import merge from './libs/merge';
  *
  * @class Model
  */
-export default class Model extends Realm.Object {
+export default class Model {
 
   /**
    * Model schema
