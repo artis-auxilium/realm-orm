@@ -38,7 +38,7 @@
     "@babel/plugin-proposal-class-properties": "^7.5.5",
     "@babel/preset-env": "^7.6.2",
     "babel-jest": "^24.9.0",
-    "jest": "^24.9.0",
+    "jest": "^25",
     "realm": "^5.0"
   }
 }

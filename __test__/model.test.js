@@ -5,6 +5,7 @@ import Holiday from './models/Holiday';
 import CPerson from './models/CPerson';
 import DB from '../';
 const PERSON_ID = 123;
+let dbInstance;
 describe('Model', () => {
   beforeAll(() => {
     let db = new DB({
@@ -17,7 +18,9 @@ describe('Model', () => {
         CPerson,
       ]
     });
+
     db.open().then((db) => {
+      dbInstance = db;
       db.write(() => {
         db.deleteAll();
       });
@@ -43,6 +46,9 @@ describe('Model', () => {
         createdAt: new Date('2011-09-26 16:42:17').toISOString()
       }]);
     });
+  });
+  afterAll(() => {
+    dbInstance.close();
   });
   it('should find primary', () => {
     let person = Person.find(PERSON_ID);
