@@ -12,10 +12,7 @@
   },
   "typings": "./index.d.ts",
   "peerDependencies": {
-    "realm": "^5.0"
-  },
-  "dependencies": {
-    "@types/jest": "^25.2.1"
+    "realm": "^6.0"
   },
   "jest": {
     "transform": {
@@ -34,11 +31,16 @@
     ]
   },
   "devDependencies": {
-    "@babel/core": "^7.6.2",
-    "@babel/plugin-proposal-class-properties": "^7.5.5",
-    "@babel/preset-env": "^7.6.2",
-    "babel-jest": "^24.9.0",
-    "jest": "^25",
-    "realm": "^5.0"
+    "@babel/core": "^7.15.5",
+    "@babel/plugin-proposal-class-properties": "^7.14.5",
+    "@babel/preset-env": "^7.15.4",
+    "@types/jest": "^27.0.1",
+    "babel-jest": "^27.1.0",
+    "corejs": "^1.0.0",
+    "jest": "^27.1.0",
+    "realm": "^6.0"
+  },
+  "dependencies": {
+    "core-js": "3"
   }
 }
