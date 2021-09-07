@@ -1,0 +1,5 @@
+__test__
+.codeclimate.yml
+.stickler.yml
+coverage
+.idea

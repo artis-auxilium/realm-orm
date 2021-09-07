@@ -2,7 +2,44 @@ import Realm from 'realm';
 import RealmQuery from '../query';
 import Person from '../../__test__/models/Person';
 import Holiday from '../../__test__/models/Holiday';
-
+let realm;
+beforeAll(() => {
+  realm = new Realm({
+    path: '/tmp/io.izlab.realmquery.test',
+    inMemory: true,
+    schema: [ Holiday, Person ]
+  });
+  realm.write(() => {
+    realm.deleteAll();
+    realm.create('Person', {
+      id: 1,
+      name: 'clinton',
+      age: 18,
+      hobbies: 'surf',
+      holidays: [],
+      createdAt: new Date('2004-12-06 03:34:06').toISOString()
+    });
+    realm.create('Person', {
+      id: 2,
+      name: 'necati',
+      age: 34,
+      hobbies: 'dev',
+      holidays: [
+        {
+          id: 1,
+          name: 'Paris'
+        }
+      ],
+      createdAt: new Date('2011-09-26 16:42:17').toISOString()
+    });
+    realm.create('Person', { id: 3, name: 'norman', age: 28,holidays: [], createdAt: new Date('2015-06-14 20:57:46').toISOString() });
+    realm.create('Person', { id: 4, name: 'elias', age: 42,holidays: [], createdAt: new Date('2006-06-13 04:35:02').toISOString() });
+    realm.create('Person', { id: 5, name: 'martin', age: 18,holidays: [], createdAt: new Date('2003-01-14 14:12:50').toISOString() });
+  });
+});
+afterAll(() => {
+  realm.close();
+})
 describe('RealmQuery', function () {
   /**
    * @type {RealmQuery}
@@ -300,39 +337,6 @@ describe('RealmQuery', function () {
 });
 
 describe('Get objects with RealmQuery', function () {
-  let realm = new Realm({
-    path: '/tmp/io.izlab.realmquery.test',
-    inMemory: true,
-    schema: [ Holiday, Person ]
-  });
-  realm.write(() => {
-    realm.deleteAll();
-    realm.create('Person', {
-      id: 1,
-      name: 'clinton',
-      age: 18,
-      hobbies: 'surf',
-      holidays: [],
-      createdAt: new Date('2004-12-06 03:34:06').toISOString()
-    });
-    realm.create('Person', {
-      id: 2,
-      name: 'necati',
-      age: 34,
-      hobbies: 'dev',
-      holidays: [
-        {
-          id: 1,
-          name: 'Paris'
-        }
-      ],
-      createdAt: new Date('2011-09-26 16:42:17').toISOString()
-    });
-    realm.create('Person', { id: 3, name: 'norman', age: 28,holidays: [], createdAt: new Date('2015-06-14 20:57:46').toISOString() });
-    realm.create('Person', { id: 4, name: 'elias', age: 42,holidays: [], createdAt: new Date('2006-06-13 04:35:02').toISOString() });
-    realm.create('Person', { id: 5, name: 'martin', age: 18,holidays: [], createdAt: new Date('2003-01-14 14:12:50').toISOString() });
-  });
-
   it('should group', () => {
     let results = RealmQuery
       .query(realm.objects(Person.schema.name))

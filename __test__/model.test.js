@@ -5,6 +5,7 @@ import Holiday from './models/Holiday';
 import CPerson from './models/CPerson';
 import DB from '../';
 const PERSON_ID = 123;
+let dbInstance;
 describe('Model', () => {
   beforeAll(() => {
     let db = new DB({
@@ -17,7 +18,9 @@ describe('Model', () => {
         CPerson,
       ]
     });
+
     db.open().then((db) => {
+      dbInstance = db;
       db.write(() => {
         db.deleteAll();
       });
@@ -26,23 +29,26 @@ describe('Model', () => {
         name: 'first person',
         age: 34,
         hobbies: 'dev',
-        createdAt: new Date('2011-09-26 16:42:17').toISOString()
+        createdAt: new Date('2011-09-26 16:42:17')
       },
       {
         id: 124,
         name: 'other person',
         age: 34,
         hobbies: 'dev',
-        createdAt: new Date('2011-09-26 16:42:17').toISOString()
+        createdAt: new Date('2011-09-26 16:42:17')
       },
       {
         id: 125,
         name: 'nobody person',
         age: 34,
         hobbies: 'dev',
-        createdAt: new Date('2011-09-26 16:42:17').toISOString()
+        createdAt: new Date('2011-09-26 16:42:17')
       }]);
     });
+  });
+  afterAll(() => {
+    dbInstance.close();
   });
   it('should find primary', () => {
     let person = Person.find(PERSON_ID);
@@ -64,17 +70,17 @@ describe('Model', () => {
   });
 
   // waiting fix https://github.com/realm/realm-js/issues/2816
-  it.skip('should delete model', () => {
+  it('should delete model', () => {
     Person.insert([{
       id: 123655,
       name: 'second person',
       age: 16,
-      createdAt: new Date().toISOString(),
+      createdAt: new Date(),
     }, {
       id: 123656,
       name: 'third person',
       age: 96,
-      createdAt: new Date().toISOString(),
+      createdAt: new Date(),
     }]);
     let person = Person.find(123655);
     person.delete();
@@ -96,7 +102,7 @@ describe('Model', () => {
       id: 15478,
       name: 'third person',
       age: 96,
-      createdAt: new Date().toISOString(),
+      createdAt: new Date(),
     }).then((object) =>{
       expect(object.name).toEqual('third person');
       expect(object).toBeDefined();
@@ -106,7 +112,7 @@ describe('Model', () => {
     CPerson.create({
       name: 'third person',
       age: 96,
-      createdAt: new Date().toISOString(),
+      createdAt: new Date(),
     }).then((object) =>{
       expect(object.name).toEqual('third person');
       expect(object).toBeDefined();
@@ -118,12 +124,12 @@ describe('Model', () => {
       {
         name: 'third person',
         age: 96,
-        createdAt: new Date().toISOString(),
+        createdAt: new Date(),
       },
       {
         name: 'other person',
         age: 97,
-        createdAt: new Date().toISOString(),
+        createdAt: new Date(),
       }
     ]).then((objects) =>{
       expect(objects).toHaveLength(2);
@@ -136,7 +142,7 @@ describe('Model', () => {
       id: 321654,
       name: 'third person',
       age: 96,
-      createdAt: new Date().toISOString(),
+      createdAt: new Date(),
     });
     let person = TPerson.find(321654);
     expect(person.age).toEqual(355);

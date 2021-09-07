@@ -19,10 +19,13 @@ export interface ModelStatic<M> {
   create(object: NonFunctionProperties<M> | NonFunctionProperties<M>[]): Promise<M>
   ids(): number[]
   delete(object: Realm.Results<M>| any ): Promise<void>
+  transform(M): M
+  syncObject(M): M
+
 }
 type NonFunctionPropertyNames<T> = { [K in keyof T]: T[K] extends Function ? never : K }[keyof Partial<T>];
 type NonFunctionProperties<T> = Pick<Partial<T>, NonFunctionPropertyNames<T>>;
-export default class Model<M extends Realm.Object> {
+export default class Model<M> extends Realm.Object {
   delete(): Promise<void>
   update(object : NonFunctionProperties<M>): Promise<void>
 }
