@@ -6,7 +6,7 @@ export class Person extends Model<Person> {
 
   id: number
   name: string
-  hobbies: ?string
+  hobbies?: string
   holidays: Holiday[]
   age: number
   createdAt: Date
