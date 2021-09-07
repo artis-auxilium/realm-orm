@@ -252,11 +252,11 @@ export default class Model {
    * @private
    * @static
    * @param {any} data
-   * @returns {boolean}
+   * @returns {Realm.UpdateMode.Modified|Realm.UpdateMode.All | string}
    * @memberof Model
    */
   static hasPrimary (data) {
-    return !!this.schema.primaryKey && !!data[this.schema.primaryKey];
+    return !!data && !!this.schema.primaryKey && !!data[this.schema.primaryKey] ? Realm.UpdateMode.Modified : Realm.UpdateMode.All;
   }
 
   /**
