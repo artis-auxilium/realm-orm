@@ -132,7 +132,7 @@ export default class Model {
    * @returns {Promise<void>}
    * @memberof Model
    */
-  static insert (data, object) {
+  static insert (data) {
     return new Promise((resolve) => {
       DB.db.write(() => {
         if (Array.isArray(data)) {
@@ -140,7 +140,7 @@ export default class Model {
           resolve();
           return ;
         }
-        this.doInsert(data, object);
+        this.doInsert(data);
         resolve();
       });
     });
@@ -176,8 +176,7 @@ export default class Model {
     return new Promise((resolve) => {
       if (Array.isArray(data)) {
         DB.db.write(() => {
-          const results  = data.map(this.doCreate.bind(this));
-          resolve(results);
+          resolve(data.map(this.doCreate.bind(this)));
         });
         return;
       }
@@ -203,18 +202,7 @@ export default class Model {
     if (typeof this.syncObject === 'function') {
       this.syncObject(data);
     }
-    let hasPrimary = this.hasPrimary(data);
-    DB.db.create(this.schema.name, data, hasPrimary);
-    let alreadyExisted;
-    if (hasPrimary) {
-      alreadyExisted = this.find(data[this.schema.primaryKey]);
-    }
-    if (alreadyExisted) {
-      return alreadyExisted;
-    } else {
-      const all = this.all();
-      return all[all.length - 1];
-    }
+    return DB.db.create(this.schema.name, data, this.hasPrimary(data));
   }
 
 
