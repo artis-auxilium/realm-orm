@@ -38,9 +38,7 @@
     "babel-jest": "^27.1.0",
     "corejs": "^1.0.0",
     "jest": "^27.1.0",
-    "realm": "^6.0"
-  },
-  "dependencies": {
+    "realm": "^6.0",
     "core-js": "3"
   }
 }
