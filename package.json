@@ -1,6 +1,6 @@
 {
   "name": "realm-orm",
-  "version": "2.0.3",
+  "version": "3.0.0-beta.1",
   "main": "index.js",
   "license": "MIT",
   "repository": {
@@ -12,7 +12,7 @@
   },
   "typings": "./index.d.ts",
   "peerDependencies": {
-    "realm": "^6.0"
+    "realm": "^10.20"
   },
   "jest": {
     "transform": {
@@ -31,14 +31,14 @@
     ]
   },
   "devDependencies": {
-    "@babel/core": "^7.15.5",
-    "@babel/plugin-proposal-class-properties": "^7.14.5",
-    "@babel/preset-env": "^7.15.4",
-    "@types/jest": "^27.0.1",
+    "@babel/core": "^7.16.0",
+    "@babel/plugin-proposal-class-properties": "^7.16.0",
+    "@babel/preset-env": "^7.16.4",
+    "@types/jest": "^27.0.3",
     "babel-jest": "^27.1.0",
     "corejs": "^1.0.0",
-    "jest": "^27.1.0",
-    "realm": "^6.0",
+    "jest": "^27.4.3",
+    "realm": "^10.20.0-beta.5",
     "core-js": "3"
   }
 }

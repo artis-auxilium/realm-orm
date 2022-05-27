@@ -27,6 +27,8 @@ describe('Model', () => {
       Person.insert([{
         id: 123,
         name: 'first person',
+        ref: 'ref',
+        ref_ext: null,
         age: 34,
         hobbies: 'dev',
         createdAt: new Date('2011-09-26 16:42:17')
@@ -34,6 +36,8 @@ describe('Model', () => {
       {
         id: 124,
         name: 'other person',
+        ref: 'nobody',
+        ref_ext: null,
         age: 34,
         hobbies: 'dev',
         createdAt: new Date('2011-09-26 16:42:17')
@@ -41,7 +45,9 @@ describe('Model', () => {
       {
         id: 125,
         name: 'nobody person',
-        age: 34,
+        ref: 'ref',
+        ref_ext: null,
+        age: 35,
         hobbies: 'dev',
         createdAt: new Date('2011-09-26 16:42:17')
       }]);
@@ -165,12 +171,20 @@ describe('Model', () => {
       limit: 5,
       return: true
     });
-    expect(res.toStringWithValues()).toEqual('((name CONTAINS[c] "dev"))');
+    expect(res.toStringWithValues()).toEqual('((name CONTAINS[c] "dev") OR (ref CONTAINS[c] "dev") OR (ref_ext CONTAINS[c] "dev"))');
     res = Person.searchText('dev', {
       stringFields: ['hobbies', 'name'],
     });
     expect(res.length).toEqual(3);
     expect(Person.searchText('pers', true)).toBeInstanceOf(RealmQuery);
+  });
+
+  it('should Search test with other params', function () {
+    let query = Person.searchText('nobody', true);
+    query.equalTo('age', 34);
+    const res = query.findAll();
+    expect(res.length).toEqual(1);
+    expect(res[0].name).toEqual("other person")
   });
 
 });
