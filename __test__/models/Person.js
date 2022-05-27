@@ -14,8 +14,10 @@ export default class First extends Model {
       },
       holidays: 'Holiday[]',
       age: 'int',
+      ref: 'string?',
+      ref_ext: 'string?',
       createdAt: 'date'
     }
   }
-  static stringFields = ['name']
+  static stringFields = ['name', 'ref', 'ref_ext']
 }
