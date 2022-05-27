@@ -17,7 +17,7 @@ beforeAll(() => {
       age: 18,
       hobbies: 'surf',
       holidays: [],
-      createdAt: new Date('2004-12-06 03:34:06').toISOString()
+      createdAt: new Date('2004-12-06 03:34:06')
     });
     realm.create('Person', {
       id: 2,
@@ -30,11 +30,11 @@ beforeAll(() => {
           name: 'Paris'
         }
       ],
-      createdAt: new Date('2011-09-26 16:42:17').toISOString()
+      createdAt: '2011-09-26 16:42:17'
     });
-    realm.create('Person', { id: 3, name: 'norman', age: 28,holidays: [], createdAt: new Date('2015-06-14 20:57:46').toISOString() });
-    realm.create('Person', { id: 4, name: 'elias', age: 42,holidays: [], createdAt: new Date('2006-06-13 04:35:02').toISOString() });
-    realm.create('Person', { id: 5, name: 'martin', age: 18,holidays: [], createdAt: new Date('2003-01-14 14:12:50').toISOString() });
+    realm.create('Person', { id: 3, name: 'norman', age: 28,holidays: [], createdAt: new Date('2015-06-14 20:57:46') });
+    realm.create('Person', { id: 4, name: 'elias', age: 42,holidays: [], createdAt: new Date('2006-06-13 04:35:02') });
+    realm.create('Person', { id: 5, name: 'martin', age: 18,holidays: [], createdAt: new Date('2003-01-14 14:12:50') });
   });
 });
 afterAll(() => {
@@ -406,7 +406,7 @@ describe('Get objects with RealmQuery', function () {
 
   it('Find by Date', () => {
     let query = RealmQuery.query(realm.objects('Person'));
-    query.equalTo('createdAt', new Date('2003-01-14 14:12:50').toISOString());
+    query.equalTo('createdAt', new Date('2003-01-14 14:12:50'));
     let res = query.findAll();
     expect(res).toHaveLength(1);
   });
