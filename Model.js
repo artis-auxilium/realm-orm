@@ -75,6 +75,7 @@ export default class Model {
       query.endGroup();
     };
     stringFields.forEach(createQuery);
+    query.endGroup();
     if (returnQuery) {
       return query;
     }
