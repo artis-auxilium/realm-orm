@@ -16,6 +16,11 @@ declare class RealmQuery<M> {
     addCriteria(critera: any): RealmQuery<M>;
     private getFilteredObjects(): Realm.Results<M>;
     toString(): string;
+
+    /**
+     * get compiled query with values
+     */
+    debug(): string;
     /**
      * Returns the average of a given field
      * @param fieldName {string}

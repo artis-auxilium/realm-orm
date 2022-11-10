@@ -97,8 +97,15 @@ class RealmQuery {
     return query.replace(/(\$\d+)/g, (part) => {
       let key = parseInt(part.replace('$', ''), 10);
       let value = this.values[key];
+      if (Array.isArray(value)) {
+        return `{ ${value.map(val => typeof val === 'string' ? `"${val}"` : val).join(', ')} }`
+      }
       return typeof value === 'string' ? `"${value}"` : value;
     });
+  }
+
+  debug () {
+    return this.toStringWithValues();
   }
 
   toString () {
