@@ -1,6 +1,6 @@
-import model from '../../Model';
+import Realm from 'realm';
 
-export default class First extends model {
+export default class First extends Realm.Object {
   static schema = {
     name: 'TPerson',
     primaryKey: 'id',

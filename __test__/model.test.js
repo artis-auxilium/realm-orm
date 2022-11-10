@@ -31,7 +31,13 @@ describe('Model', () => {
         ref_ext: null,
         age: 34,
         hobbies: 'dev',
-        createdAt: new Date('2011-09-26 16:42:17')
+        createdAt: new Date('2011-09-26 16:42:17'),
+        holidays: [
+          {
+            id: 1,
+            name: 'summer'
+          }
+        ]
       },
       {
         id: 124,
@@ -46,7 +52,7 @@ describe('Model', () => {
         id: 125,
         name: 'nobody person',
         ref: 'ref',
-        ref_ext: null,
+        ref_ext: 'ref',
         age: 35,
         hobbies: 'dev',
         createdAt: new Date('2011-09-26 16:42:17')
@@ -101,6 +107,16 @@ describe('Model', () => {
 
   it('should get ids', () => {
     expect(Person.ids()).toHaveLength(3);
+  });
+
+  it('should find person with in', function () {
+    let persons = Person.query().in('age', [34,35,78]).findAll()
+    expect(persons.length).toEqual(3)
+  });
+
+  it('should find person with not in', function () {
+    let persons = Person.query().notIn('age', [35,78]).findAll()
+    expect(persons.length).toEqual(2)
   });
 
   it('Should create and return object created without primary key', () => {
@@ -185,6 +201,15 @@ describe('Model', () => {
     const res = query.findAll();
     expect(res.length).toEqual(1);
     expect(res[0].name).toEqual("other person")
+  });
+  it('should use raw query', function () {
+    let persons = Person.query().raw('ref = ref_ext').findAll();
+    expect(persons.length).toEqual(1)
+  });
+
+  it('should insert sub object', function () {
+    let person = Person.find(PERSON_ID);
+    expect(person.holidays.length).toEqual(1);
   });
 
 });

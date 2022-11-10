@@ -1,7 +1,7 @@
 // @ts-check
-import Model from '../../Model';
+import Realm from 'realm';
 
-export default class First extends Model {
+export default class First extends Realm.Object {
   static schema = {
     name: 'Person',
     primaryKey: 'id',

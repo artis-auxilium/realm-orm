@@ -153,22 +153,22 @@ describe('RealmQuery', function () {
   describe('between', function () {
     it('between number to number', function () {
       query.between('age', 20, 30);
-      expect(query.toStringWithValues()).toEqual('(age >= 20 AND age <= 30)');
+      expect(query.toStringWithValues()).toEqual('age BETWEEN {20, 30}');
     });
     it('between date to date', function () {
       const start = new Date();
       const end = new Date();
       query.between('createdAt', start, end);
-      expect(query.toStringWithValues()).toEqual(`(createdAt >= ${start} AND createdAt <= ${end})`);
+      expect(query.toStringWithValues()).toEqual(`createdAt BETWEEN {${start}, ${end}}`);
     });
 
     it('should multiple between', () => {
       query.between('field.test', 5, 10).between('field2.test', 20, 50);
       expect(query.toStringWithValues())
-        .toEqual('(field.test >= 5 AND field.test <= 10) AND (field2.test >= 20 AND field2.test <= 50)');
+        .toEqual('field.test BETWEEN {5, 10} AND field2.test BETWEEN {20, 50}');
       query = RealmQuery.query().between('field.test', 5, 10).orBetween('field2.test', 20, 50);
       expect(query.toStringWithValues())
-        .toEqual('(field.test >= 5 AND field.test <= 10) OR (field2.test >= 20 AND field2.test <= 50)');
+        .toEqual('field.test BETWEEN {5, 10} OR field2.test BETWEEN {20, 50}');
     });
 
   });
@@ -227,23 +227,19 @@ describe('RealmQuery', function () {
   describe('In', function () {
     it('In array of number', function () {
       query.in('id', [ 1, 2 ]);
-      expect(query.toStringWithValues()).toEqual('(id == 1 OR id == 2)');
+      expect(query.toStringWithValues()).toEqual('id in { 1, 2 }');
       query.orIn('age', [ 20, 23 ]);
-      expect(query.toStringWithValues()).toEqual('(id == 1 OR id == 2) OR (age == 20 OR age == 23)');
+      expect(query.toStringWithValues()).toEqual('id in { 1, 2 } OR age in { 20, 23 }');
     });
     it('not In', function () {
       query.notIn('id', [ 1, 2 ]);
-      expect(query.toStringWithValues()).toEqual('(id != 1 AND id != 2)');
-      query.orNotIn('age', [ 1, 2 ]);
-      expect(query.toStringWithValues()).toEqual('(id != 1 AND id != 2) OR (age != 1 AND age != 2)');
+      expect(query.toStringWithValues()).toEqual('id in NONE { 1, 2 }');
+      query.orNotIn('age', [ 4, 5 ]);
+      expect(query.toStringWithValues()).toEqual('id in NONE { 1, 2 } OR age in NONE { 4, 5 }');
     });
     it('In array of string', function () {
       query.in('status', [ 'ACTIVE', 'DEACTIVE' ]);
-      expect(query.toStringWithValues()).toEqual('(status == "ACTIVE" OR status == "DEACTIVE")');
-    });
-    it('In array of mix values', function () {
-      query.in('id', [ 1001, 'abcd' ]);
-      expect(query.toStringWithValues()).toEqual('(id == 1001 OR id == "abcd")');
+      expect(query.toStringWithValues()).toEqual('status in { "ACTIVE", "DEACTIVE" }');
     });
   });
 
@@ -255,7 +251,7 @@ describe('RealmQuery', function () {
         .greaterThan('age', 25)
         .in('id', [ 1001, 1002 ]);
 
-      let expected = 'name CONTAINS[c] "phu" AND (age > 25 AND (id == 1001 OR id == 1002))';
+      let expected = 'name CONTAINS[c] "phu" AND (age > 25 AND id in { 1001, 1002 })';
       expect(query.toStringWithValues()).toEqual(expected);
     });
 
@@ -265,7 +261,7 @@ describe('RealmQuery', function () {
         .beginGroup()
         .greaterThan('age', 25)
         .in('id', [ 1001, 1002 ]);
-      let expected = 'name CONTAINS[c] "phu" AND (age > 25 AND (id == 1001 OR id == 1002))';
+      let expected = 'name CONTAINS[c] "phu" AND (age > 25 AND id in { 1001, 1002 })';
       expect(query.toStringWithValues()).toEqual(expected);
     });
     it('complex query with not', function () {
@@ -275,7 +271,7 @@ describe('RealmQuery', function () {
         .greaterThan('age', 25)
         .in('id', [ 1001, 1002 ]);
 
-      let expected = 'NOT(name CONTAINS[c] "phu" AND (age > 25 AND (id == 1001 OR id == 1002)))';
+      let expected = 'NOT(name CONTAINS[c] "phu" AND (age > 25 AND id in { 1001, 1002 }))';
       expect(query.toStringWithValues()).toEqual(expected);
     });
 
@@ -283,13 +279,13 @@ describe('RealmQuery', function () {
       query = RealmQuery.query().contains('name', 'phu', true);
       let query2 = RealmQuery.query().in('id', [ 1001, 1002 ]);
       query.join(query2);
-      expect(query.toStringWithValues()).toEqual('name CONTAINS[c] "phu" AND (id == 1001 OR id == 1002)');
+      expect(query.toStringWithValues()).toEqual('name CONTAINS[c] "phu" AND id in { 1001, 1002 }');
     });
     it('combine complex query with or', function () {
       query = RealmQuery.query().contains('name', 'phu', true);
       let query2 = RealmQuery.query().in('id', [ 1001, 1002 ]);
       query.orJoin(query2);
-      expect(query.toStringWithValues()).toEqual('name CONTAINS[c] "phu" OR (id == 1001 OR id == 1002)');
+      expect(query.toStringWithValues()).toEqual('name CONTAINS[c] "phu" OR id in { 1001, 1002 }');
     });
 
     it('multiple group', () => {
@@ -318,7 +314,7 @@ describe('RealmQuery', function () {
         })
         .endGroup()
         .equalTo('field10', 2);
-      expect(query.toStringWithValues()).toEqual('field1 == "string" AND (field2 == 20 AND field3 == 40 OR (field4 BEGINSWITH "sdsds" AND ((field5 == 20 AND field6 == "sdsds") OR ((group >= 20 AND group <= 30)) AND field7 == "asasa")) AND (field8 == "20" AND field9 == 20)) AND field10 == 2');// eslint-disable-line
+      expect(query.toStringWithValues()).toEqual('field1 == "string" AND (field2 == 20 AND field3 == 40 OR (field4 BEGINSWITH "sdsds" AND ((field5 == 20 AND field6 == "sdsds") OR (group BETWEEN {20, 30}) AND field7 == "asasa")) AND (field8 == "20" AND field9 == 20)) AND field10 == 2');// eslint-disable-line
     });
 
     it('should or on exit group', () => {
@@ -332,6 +328,30 @@ describe('RealmQuery', function () {
       expect(query.toStringWithValues()).toEqual(excepted);
     });
 
+  });
+  it('should use raw value', function () {
+      query.equalTo('field', RealmQuery.raw('test'))
+    expect(query.toStringWithValues()).toEqual('field == test')
+  });
+
+  it('should use query raw', function () {
+      query.raw('field == test')
+    expect(query.toStringWithValues()).toEqual('field == test')
+  });
+
+  it('should use query orRaw', function () {
+      query.raw('field == test').orRaw('field2 == otherTest')
+    expect(query.toStringWithValues()).toEqual('field == test OR field2 == otherTest')
+  });
+
+  it('should distinct', function () {
+    query.distinct('field')
+    expect(query.toStringWithValues()).toEqual(' DISTINCT(field)')
+  });
+
+  it('should multiple distinct', function () {
+    query.distinct(['field', 'field2'])
+    expect(query.toStringWithValues()).toEqual(' DISTINCT(field, field2)')
   });
 
 });
@@ -399,9 +419,10 @@ describe('Get objects with RealmQuery', function () {
 
   it('Find first', function () {
     let query = RealmQuery.query(realm.objects('Person'));
+    /** @type Person */
     let result = query.findFirst();
     let expected = realm.objects('Person')[0];
-    expect(JSON.stringify(result)).toEqual(JSON.stringify(expected));
+    expect(result.id).toEqual(expected.id);
   });
 
   it('Find by Date', () => {
@@ -487,5 +508,14 @@ describe('Get objects with RealmQuery', function () {
     expect(results.length).toEqual(4);
     expect(results).toBeInstanceOf(Realm.Results);
   });
+  it('DISTINCT results without filter', function () {
+    let results = RealmQuery
+        .query(realm.objects('Person'))
+        .distinct('age');
+    expect(() => {
+      results.findAll();
+    }).toThrowError('Can\'t have sort or distinct without query filter');
+  });
+
 
 });
