@@ -329,6 +329,30 @@ describe('RealmQuery', function () {
     });
 
   });
+  it('should use raw value', function () {
+      query.equalTo('field', RealmQuery.raw('test'))
+    expect(query.toStringWithValues()).toEqual('field == test')
+  });
+
+  it('should use query raw', function () {
+      query.raw('field == test')
+    expect(query.toStringWithValues()).toEqual('field == test')
+  });
+
+  it('should use query orRaw', function () {
+      query.raw('field == test').orRaw('field2 == otherTest')
+    expect(query.toStringWithValues()).toEqual('field == test OR field2 == otherTest')
+  });
+
+  it('should distinct', function () {
+    query.distinct('field')
+    expect(query.toStringWithValues()).toEqual(' DISTINCT(field)')
+  });
+
+  it('should multiple distinct', function () {
+    query.distinct(['field', 'field2'])
+    expect(query.toStringWithValues()).toEqual(' DISTINCT(field, field2)')
+  });
 
 });
 

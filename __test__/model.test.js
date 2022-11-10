@@ -52,7 +52,7 @@ describe('Model', () => {
         id: 125,
         name: 'nobody person',
         ref: 'ref',
-        ref_ext: null,
+        ref_ext: 'ref',
         age: 35,
         hobbies: 'dev',
         createdAt: new Date('2011-09-26 16:42:17')
@@ -202,6 +202,11 @@ describe('Model', () => {
     expect(res.length).toEqual(1);
     expect(res[0].name).toEqual("other person")
   });
+  it('should use raw query', function () {
+    let persons = Person.query().raw('ref = ref_ext').findAll();
+    expect(persons.length).toEqual(1)
+  });
+
   it('should insert sub object', function () {
     let person = Person.find(PERSON_ID);
     expect(person.holidays.length).toEqual(1);

@@ -700,6 +700,14 @@ class RealmQuery {
     });
     return this.addCriteria(newQuery.replace(/__joinPos__/g, ''), condition);
   }
+
+  raw(raw) {
+    return this.addCriteria(raw, 'AND')
+  }
+
+  orRaw(raw) {
+    return this.addCriteria(raw, 'OR')
+  }
   /**
    * @private
    * Create new query
@@ -708,8 +716,7 @@ class RealmQuery {
   static query (objects) {
     return new RealmQuery(objects);
   }
+  static raw = (query) => new rawQuery(query);
 }
-
-RealmQuery.raw = (query) => new rawQuery(query);
 
 export default RealmQuery;
