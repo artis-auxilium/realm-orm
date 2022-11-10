@@ -1,12 +1,18 @@
 import Realm from 'realm';
-import Query from './libs/query';
-
-Realm.Results.prototype.query = function () {
-  return Query.query(this);
-};
+import './libs/extensions';
 
 class DB {
+  /**
+   *
+   * @param {Realm.Configuration} options
+   */
   constructor (options) {
+    if (options.migration && !options.onMigration) {
+      options.onMigration = options.migration;
+    }
+    if (options.shouldCompactOnLaunch && !options.shouldCompact) {
+      options.shouldCompact = options.shouldCompactOnLaunch;
+    }
     this.realmOptions = options;
   }
   /**

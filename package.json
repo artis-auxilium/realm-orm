@@ -12,7 +12,10 @@
   },
   "typings": "./index.d.ts",
   "peerDependencies": {
-    "realm": "^10.20"
+    "realm": "^11.1.0"
+  },
+  "scripts": {
+    "test": "jest"
   },
   "jest": {
     "transform": {
@@ -38,7 +41,7 @@
     "babel-jest": "^27.1.0",
     "corejs": "^1.0.0",
     "jest": "^27.4.3",
-    "realm": "^10.20.0-beta.5",
+    "realm": "^11.1.0",
     "core-js": "3"
   }
 }

@@ -1,6 +1,6 @@
 
 import Model, { ModelStatic } from '../../Model';
-import Holiday from './Holiday';
+import {Holiday} from './Holiday';
 
 export class Person extends Model<Person> {
 

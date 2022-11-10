@@ -2,10 +2,10 @@
 import Model, { ModelStatic } from '../../Model';
 
 
-export class Person extends Model<Person> {
+export class Holiday extends Model<Holiday> {
     id: number
     name: string
 }
 
-declare var person : ModelStatic<Person>
-export default person;
+declare var holiday : ModelStatic<Holiday>
+export default holiday;

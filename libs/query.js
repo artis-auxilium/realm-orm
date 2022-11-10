@@ -10,6 +10,11 @@ let reducePath = (obj, index) => obj[index];
   * @param { string | number | boolean | Date}
   */
 
+/**
+ * @typedef Condition
+ * @param {'AND'|'OR'}
+ */
+
 class rawQuery {
   constructor (raw) {
     this.raw = raw;
@@ -46,7 +51,7 @@ class RealmQuery {
   /**
    * @private
    * @param {any} critera
-   * @param {any} condition
+   * @param {Condition} condition
    * @returns {RealmQuery}
    * @memberof RealmQuery
    */
@@ -139,6 +144,7 @@ class RealmQuery {
   * @param {'ASC'|'DESC'} order
   */
   sort (fieldName, order = 'ASC') {
+    /* istanbul ignore if */
     if (typeof order ==='boolean') {
       console.warn('RealmQuery: use of old sort, should use "ASC" or "DESC');
       order = order ? 'DESC' : 'ASC';
@@ -216,14 +222,14 @@ class RealmQuery {
    * Between condition
    *
    * @param {string} fieldName
-   * @param {CompareValueType} from
+   * @param {CompareValueType|CompareValueType[]} from
    * @param {CompareValueType} to
    * @return {RealmQuery}
    */
   between (fieldName, from, to) {
     let posFrom = this.addValue(from);
     let posTo = this.addValue(to);
-    return this.addCriteria(`(${fieldName} >= $${posFrom} AND ${fieldName} <= $${posTo})`, 'AND');
+    return this.addCriteria(`${fieldName} BETWEEN {$${posFrom}, $${posTo}}`, 'AND');
   }
 
   /**
@@ -237,7 +243,7 @@ class RealmQuery {
   orBetween (fieldName, from, to) {
     let posFrom = this.addValue(from);
     let posTo = this.addValue(to);
-    return this.addCriteria(`(${fieldName} >= $${posFrom} AND ${fieldName} <= $${posTo})`, 'OR');
+    return this.addCriteria(`${fieldName} BETWEEN {$${posFrom}, $${posTo}}`, 'OR');
   }
 
   /**
@@ -453,16 +459,12 @@ class RealmQuery {
    *
    * @param {string} fieldName
    * @param {EqualValueType[]} values
+   * @param {Condition} condition
    * @return {RealmQuery}
    */
   in (fieldName, values, condition = 'AND') {
-    const criteria = [];
-    let cb = (value) => {
-      let pos = this.addValue(value);
-      criteria.push(`${fieldName} == $${pos}`);
-    };
-    values.forEach(cb);
-    return this.addCriteria(`(${ criteria.join(' OR ') })`, condition);
+      let pos = this.addValue(values);
+      return this.addCriteria(`${fieldName} in $${pos}`, condition);
   }
 
   /**
@@ -481,16 +483,12 @@ class RealmQuery {
    *
    * @param {string} fieldName
    * @param {EqualValueType[]} values
+   * @param {Condition} condition
    * @return {RealmQuery}
    */
   notIn (fieldName, values, condition = 'AND') {
-    const criteria = [];
-    let cb = (value) => {
-      let pos = this.addValue(value);
-      criteria.push(`${fieldName} != $${pos}`);
-    };
-    values.forEach(cb);
-    return this.addCriteria(`(${ criteria.join(' AND ') })`, condition);
+      let pos = this.addValue(values);
+      return this.addCriteria(`${fieldName} in NONE $${pos}`, condition);
   }
 
   /**
@@ -510,7 +508,7 @@ class RealmQuery {
    * @returns {RealmQuery}
    */
   isNotNull (fieldName) {
-    return this.addCriteria(`${fieldName} != null`, 'AND');
+    return this.addCriteria(`${fieldName} != nil`, 'AND');
   }
   /**
    * null comparaison
@@ -518,14 +516,14 @@ class RealmQuery {
    * @returns {RealmQuery}
    */
   isNull (fieldName) {
-    return this.addCriteria(`${fieldName} == null`, 'AND');
+    return this.addCriteria(`${fieldName} == nil`, 'AND');
   }  /**
    * not null comparaison
    * @param {string} fieldName
    * @returns {RealmQuery}
    */
   orIsNotNull (fieldName) {
-    return this.addCriteria(`${fieldName} != null`, 'OR');
+    return this.addCriteria(`${fieldName} != nil`, 'OR');
   }
   /**
    * null comparaison
@@ -555,8 +553,9 @@ class RealmQuery {
   /**
    * Like operator
    * @private
-   * @param fieldName
-   * @param value
+   * @param {string} fieldName
+   * @param {string} value
+   * @param {Condition} condition
    */
   like (fieldName, value, condition = 'AND') {
     let pos = this.addValue(value);
@@ -682,6 +681,7 @@ class RealmQuery {
   /**
    * @private
    * @param {RealmQuery} query
+   * @param {Condition} condition
    * @returns {RealmQuery}
    * @memberof RealmQuery
    */
