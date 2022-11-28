@@ -1,6 +1,6 @@
 {
   "name": "realm-orm",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "exports": {
     "." : {
       "import": "./index.js",
