@@ -1,7 +1,7 @@
 // @ts-check
 import Model from '../../Model';
 
-export default class CPerson extends Model {
+export default class CPerson extends Model<CPerson> {
   static schema = {
     name: 'CPerson',
     properties: {

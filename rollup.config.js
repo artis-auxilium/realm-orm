@@ -12,9 +12,7 @@ const plugins = [
         browser: false,
         modulesOnly: true,
     }),
-    commonjs({
-        ignore: 'core-js'
-    }),
+    commonjs(),
 ];
 
 const createConfig = (filename) => ({

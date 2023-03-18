@@ -538,7 +538,7 @@ class RealmQuery {
    * @returns {RealmQuery}
    */
   orIsNull (fieldName) {
-    return this.addCriteria(`${fieldName} == null`, 'OR');
+    return this.addCriteria(`${fieldName} == nil`, 'OR');
   }
 
   isEmpty (fieldName) {

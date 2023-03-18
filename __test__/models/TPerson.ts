@@ -1,6 +1,6 @@
-import Realm from 'realm';
+import Model from "../../Model";
 
-export default class First extends Realm.Object {
+export default class TPerson extends Model<TPerson> {
   static schema = {
     name: 'TPerson',
     primaryKey: 'id',
@@ -16,7 +16,14 @@ export default class First extends Realm.Object {
     }
   }
 
+  id: number
+  name: string
+  hobbies?: string
+  age: number
+  createdAt: Date
+
   static transform (data) {
     data.age = 355;
+    return data;
   }
 }
