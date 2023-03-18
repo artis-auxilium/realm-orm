@@ -1,7 +1,6 @@
 import Realm from 'realm';
 import Query from './query';
 import Model from "../Model";
-import merge from './merge';
 import DB from '../';
 
 /**
@@ -166,7 +165,10 @@ Realm.Object.update = function (object, data) {
     return new Promise((resolve, reject) => {
         try {
             DB.db.write(() => {
-                merge(data, object);
+                Object.keys(data).forEach((key) => {
+                    object[key] = data[key];
+                })
+                // merge(data, object);
                 resolve();
             });
 

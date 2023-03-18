@@ -3,15 +3,18 @@ import Person from './models/Person';
 import TPerson from './models/TPerson';
 import Holiday from './models/Holiday';
 import CPerson from './models/CPerson';
+import * as fs from "fs";
 import DB from '../';
+import Place from "./models/Place";
 const PERSON_ID = 123;
-let dbInstance;
+let dbInstance: Realm;
 describe('Model', () => {
   beforeAll(() => {
     let db = new DB({
-      path: '/tmp/realm.test',
+      path: `${fs.mkdtempSync('/tmp/realm-orm-model')}/test.realm`,
       inMemory: true,
       schema: [
+        Place,
         Holiday,
         Person,
         TPerson,
@@ -32,10 +35,18 @@ describe('Model', () => {
         age: 34,
         hobbies: 'dev',
         createdAt: new Date('2011-09-26 16:42:17'),
+        place: {
+          name: 'Place',
+          id: 1
+        },
         holidays: [
           {
             id: 1,
             name: 'summer'
+          },
+        {
+            id: 2,
+            name: ''
           }
         ]
       },
@@ -114,6 +125,11 @@ describe('Model', () => {
     expect(persons.length).toEqual(3)
   });
 
+  it('should check empty nested', function () {
+    let persons = Person.query().isNotNull('place.name').findAll();
+    expect(persons.length).toEqual(1);
+  });
+
   it('should find person with not in', function () {
     let persons = Person.query().notIn('age', [35,78]).findAll()
     expect(persons.length).toEqual(2)
@@ -174,20 +190,20 @@ describe('Model', () => {
     expect(() => {
       TPerson.searchText('pers');
     }).toThrowError('stringFields not defined');
-    let res = Person.searchText('pers');
+    let res  = Person.searchText('pers');
     expect(res.length).toEqual(3);
     res = Person.searchText('pers', 2);
     expect(res.length).toEqual(2);
-    res = Person.searchText('dev', {
+    let resQuery : RealmQuery<Person> = Person.searchText('dev', {
       stringFields: ['hobbies', 'name'],
       return: true
     });
-    expect(res.toStringWithValues()).toEqual('((hobbies CONTAINS[c] "dev") OR (name CONTAINS[c] "dev"))');
-    res = Person.searchText('dev', {
+    expect(resQuery.debug()).toEqual('((hobbies CONTAINS[c] "dev") OR (name CONTAINS[c] "dev"))');
+    resQuery = Person.searchText('dev', {
       limit: 5,
       return: true
     });
-    expect(res.toStringWithValues()).toEqual('((name CONTAINS[c] "dev") OR (ref CONTAINS[c] "dev") OR (ref_ext CONTAINS[c] "dev"))');
+    expect(resQuery.debug()).toEqual('((name CONTAINS[c] "dev") OR (ref CONTAINS[c] "dev") OR (ref_ext CONTAINS[c] "dev"))');
     res = Person.searchText('dev', {
       stringFields: ['hobbies', 'name'],
     });
@@ -196,7 +212,7 @@ describe('Model', () => {
   });
 
   it('should Search test with other params', function () {
-    let query = Person.searchText('nobody', true);
+    let query: RealmQuery<Person> = Person.searchText('nobody', true);
     query.equalTo('age', 34);
     const res = query.findAll();
     expect(res.length).toEqual(1);
@@ -209,7 +225,17 @@ describe('Model', () => {
 
   it('should insert sub object', function () {
     let person = Person.find(PERSON_ID);
-    expect(person.holidays.length).toEqual(1);
+    expect(person.holidays.length).toEqual(2);
   });
+
+  it('should update sub object', function () {
+    let person = Person.find(PERSON_ID);
+    let holidays = person.holidays.concat({ id: 2, name: 'winter' });
+    person.update({ holidays });
+    expect(person.holidays.length).toEqual(3);
+    expect(person.holidays.map(holiday => holiday.name)).toEqual(['summer', 'winter', 'winter'])
+  });
+
+
 
 });

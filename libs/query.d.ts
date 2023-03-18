@@ -1,21 +1,47 @@
 /// <reference types="realm" />
 import { Results } from 'realm';
+import Model from "../Model";
+import Person from "../__test__/models/Person";
+import Holiday from "../__test__/models/Holiday";
 export declare type ILogicOperator = 'AND' | 'OR';
-export declare type EqualValueType = string | number | boolean | Date;
-export declare type CompareValueType = number | Date;
+export declare type EqualValueType = string | number | boolean | Date | RawQuery;
+export declare type CompareValueType = number | Date | RawQuery;
 type keyOfType<T, KT> = { [K in keyof T]: T[K] extends KT ? K : never }[keyof T];
-type keyOfCompareValueType<T> = keyOfType<T, CompareValueType>
-type keyOfEqualValueType<T> = keyOfType<T, EqualValueType>
-type keyOfStringType<T> = keyOfType<T, string>
-type keyOfNumberType<T> = keyOfType<T, number>;
+type keyOfCompareValueType<T extends Model<T>> = NestedKeyOfType<T, CompareValueType>
+type keyOfEqualValueType<T extends Model<T>> = NestedKeyOfType<T, EqualValueType>
+type keyOfStringType<T extends Model<T>> = NestedKeyOfType<T, string>
+type keyOfNumberType<T extends Model<T>> = NestedKeyOfType<T, number>;
+type NonFunctionPropertyNames<T> = { [K in keyof T]: T[K] extends Function ? never : K }[keyof Partial<T>];
+type NonFunctionProperties<T> = Pick<Partial<T>, NonFunctionPropertyNames<T>>;
 declare type groupCallback = (cb: RealmQuery<any>) => RealmQuery<any>
-declare class RealmQuery<M> {
+// add `& (string | number)` to the keyof ObjectType
+type NestedKeyOf<ObjectType extends Model<ObjectType>> =
+{[Key in keyof ObjectType & (string | number)]: ObjectType[Key] extends Function? never : ObjectType[Key] extends Model<ObjectType[Key]>
+? `${Key}` | `${Key}.${NestedKeyOf<ObjectType[Key]>}`
+: `${Key}`
+}[keyof ObjectType & (string | number)];
+
+type NestedKeyOfType<ObjectType extends Model<ObjectType>, T> =
+{[Key in keyof ObjectType & (string | number )]: ObjectType[Key] extends Function ? `${Key}.Func` : ObjectType[Key] extends T ? `${Key}` : ObjectType[Key] extends Model<ObjectType[Key]>
+? `${Key}.${NestedKeyOfType<ObjectType[Key], T>}`
+: ObjectType[Key] extends Array<Model<ObjectType[Key]>> ? Key : `${Key}.no`
+}[keyof ObjectType & (string | number)];
+
+type test = NestedKeyOfType<Person, string>
+
+
+declare class RawQuery {
+    private raw
+    toString(): string
+}
+declare class RealmQuery<M extends Model<M>> {
     private objects;
     private criteria;
     constructor(objects?: Results<M>);
     addCriteria(critera: any): RealmQuery<M>;
     private getFilteredObjects(): Realm.Results<M>;
     toString(): string;
+    debug(): string;
 
     /**
      * get compiled query with values
@@ -33,7 +59,7 @@ declare class RealmQuery<M> {
    * @param {string|string[]} fieldName
    * @return {RealmQuery}
    */
-    distinct (fieldName: keyof M): RealmQuery<M>
+    distinct (fieldName: NonFunctionPropertyNames<M>| Array<NonFunctionPropertyNames<M>>): RealmQuery<M>
     /**
      * Set sorted into realm.objects
      *
@@ -61,7 +87,7 @@ declare class RealmQuery<M> {
     * Only supported for int, float, double and date properties.
     * null values are ignored entirely by this method and will not be returned.
     */
-    max<T extends keyOfCompareValueType<M>>(fieldName: T): M[T];
+    max<T extends keyOfType<M, CompareValueType>>(fieldName: T): M[T];
 
     /**
     * Returns the minimum value of the values in the collection or of the given property
@@ -69,7 +95,7 @@ declare class RealmQuery<M> {
     * Only supported for int, float, double and date properties.
     * null values are ignored entirely by this method and will not be returned
     */
-    min<T extends keyOfCompareValueType<M>>(fieldName: T): M[T];
+    min<T extends keyOfType<M, CompareValueType>>(fieldName: T): M[T];
 
     /**
      * Calculates the sum of a given field
@@ -259,9 +285,10 @@ declare class RealmQuery<M> {
     isNotEmpty(fieldName: keyOfStringType<M>): RealmQuery<M>;
     orIsEmpty(fieldName: keyOfStringType<M>): RealmQuery<M>;
     orIsNotEmpty(fieldName: keyOfStringType<M>): RealmQuery<M>;
-    isNotNull(fieldName: keyof M): RealmQuery<M>;
-    orIsNotNull(fieldName: keyof M): RealmQuery<M>;
-    isNull(fieldName: keyof M): RealmQuery<M>;
+    isNotNull(fieldName: NestedKeyOf<M> | string): RealmQuery<M>;
+    orIsNotNull(fieldName: NestedKeyOf<M> | string): RealmQuery<M>;
+    isNull(fieldName: NestedKeyOf<M>| string): RealmQuery<M>;
+    orIsNull(fieldName: NestedKeyOf<M>| string): RealmQuery<M>;
 
     /**
      *
@@ -291,15 +318,21 @@ declare class RealmQuery<M> {
     endGroup(): RealmQuery<M>;
 
     group(cb: groupCallback ): RealmQuery<M>
+    orGroup(cb: groupCallback ): RealmQuery<M>
 
     /**
      * Combine to another query
      */
     join(query: any): RealmQuery<M>;
+    orJoin(query: any): RealmQuery<M>;
+
+    raw(query: string): RealmQuery<M>
+    orRaw(query: string): RealmQuery<M>
+    static raw(query: string): RawQuery
     /**
      * Create new query
      * @param objects {Realm.Collection}
      */
-    static query<M>(objects: Results<M>): RealmQuery<M>;
+    static query<M extends Model<M>>(objects?: Results<M>): RealmQuery<M>;
 }
 export default RealmQuery;

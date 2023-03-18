@@ -7,10 +7,14 @@ class DB {
    * @param {Realm.Configuration} options
    */
   constructor (options) {
+    /* istanbul ignore next  */
     if (options.migration && !options.onMigration) {
+      console.warn("Use of deprecated option migration")
       options.onMigration = options.migration;
     }
+    /* istanbul ignore next  */
     if (options.shouldCompactOnLaunch && !options.shouldCompact) {
+      console.warn("Use of deprecated option shouldCompactOnLaunch")
       options.shouldCompact = options.shouldCompactOnLaunch;
     }
     this.realmOptions = options;
