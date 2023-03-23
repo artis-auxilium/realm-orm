@@ -20,14 +20,13 @@ type NestedKeyOf<ObjectType extends Model<ObjectType>> =
 ? `${Key}` | `${Key}.${NestedKeyOf<ObjectType[Key]>}`
 : `${Key}`
 }[keyof ObjectType & (string | number)];
-
 type NestedKeyOfType<ObjectType extends Model<ObjectType>, T> =
-{[Key in keyof ObjectType & (string | number )]: ObjectType[Key] extends Function ? `${Key}.Func` : ObjectType[Key] extends T ? `${Key}` : ObjectType[Key] extends Model<ObjectType[Key]>
-? `${Key}.${NestedKeyOfType<ObjectType[Key], T>}`
-: ObjectType[Key] extends Array<Model<ObjectType[Key]>> ? Key : `${Key}.no`
+{[Key in keyof ObjectType & (string | number )]:
+        ObjectType[Key] extends Function ? never :
+            ObjectType[Key] extends T ? `${Key}` :
+                ObjectType[Key] extends Model<ObjectType[Key]>? `${Key}.${NestedKeyOfType<ObjectType[Key], T>}`
+                    : never
 }[keyof ObjectType & (string | number)];
-
-type test = NestedKeyOfType<Person, string>
 
 
 declare class RawQuery {
