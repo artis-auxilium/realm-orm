@@ -4,6 +4,7 @@ import * as Realm from 'realm'
 interface SearchOption {
     stringFields?: string[]
     limit?: number,
+    casing?: boolean
 }
 
 interface SearchOptionQuery extends SearchOption{
@@ -47,10 +48,10 @@ export default abstract class Model<M> extends Realm.Object<M> {
     static delete<T extends M>(object: Realm.Results<T> | T): Promise<void>
 
     // @ts-ignore
-    static transform<T extends Partial<M>>(data: T): T
+    static transform(data: any): any
 
     // @ts-ignore
-    static syncObject<T extends Partial<M>>(data: T): T
+    static syncObject(data: any): any
 
     delete(): Promise<void>
 

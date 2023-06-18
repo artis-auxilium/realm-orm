@@ -37,7 +37,8 @@ describe('Model', () => {
         createdAt: new Date('2011-09-26 16:42:17'),
         place: {
           name: 'Place',
-          id: 1
+          id: 1,
+          nb_peoples: 15
         },
         holidays: [
           {
@@ -196,19 +197,36 @@ describe('Model', () => {
     expect(res.length).toEqual(2);
     let resQuery : RealmQuery<Person> = Person.searchText('dev', {
       stringFields: ['hobbies', 'name'],
+      casing: true,
       return: true
     });
     expect(resQuery.debug()).toEqual('((hobbies CONTAINS[c] "dev") OR (name CONTAINS[c] "dev"))');
     resQuery = Person.searchText('dev', {
       limit: 5,
-      return: true
+      return: true,
+      casing: true
     });
-    expect(resQuery.debug()).toEqual('((name CONTAINS[c] "dev") OR (ref CONTAINS[c] "dev") OR (ref_ext CONTAINS[c] "dev"))');
+    expect(resQuery.debug())
+        .toEqual('((name CONTAINS[c] "dev") OR (ref CONTAINS[c] "dev") OR (ref_ext CONTAINS[c] "dev"))');
     res = Person.searchText('dev', {
       stringFields: ['hobbies', 'name'],
     });
     expect(res.length).toEqual(3);
     expect(Person.searchText('pers', true)).toBeInstanceOf(RealmQuery);
+  });
+
+  it('should search text on multiple words', function () {
+    let resQuery = Person.searchText('dev other', {
+      limit: 5,
+      return: true,
+      casing: true
+    });
+    expect(resQuery.debug())
+        .toEqual('(' +
+            '(name CONTAINS[c] "dev" AND name CONTAINS[c] "other") ' +
+            'OR (ref CONTAINS[c] "dev" AND ref CONTAINS[c] "other") ' +
+            'OR (ref_ext CONTAINS[c] "dev" AND ref_ext CONTAINS[c] "other"))'
+);
   });
 
   it('should Search test with other params', function () {

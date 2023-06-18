@@ -5,9 +5,10 @@ import DB from '../';
 
 /**
  * @typedef searchTextOption
- * @param {Array} stringFields array of string fields to search term
- * @param {boolean} return return query when true (limit has no effect if true)
- * @param {number} limit
+ * @property {Array} stringFields array of string fields to search term
+ * @property {boolean} casing
+ * @property {boolean} return return query when true (limit has no effect if true)
+ * @property {number} limit
  */
 
 
@@ -34,9 +35,11 @@ import DB from '../';
 Realm.Object.searchText = function (term, limit) {
     let returnQuery = limit && typeof limit === 'boolean';
     let stringFields = this.stringFields || [];
+    let casing = false;
     if (typeof limit === 'object') {
         stringFields = limit.stringFields || stringFields;
         returnQuery = limit.return;
+        casing = limit.casing;
         limit = limit.limit;
     }
     if (stringFields.length === 0) {
@@ -46,7 +49,7 @@ Realm.Object.searchText = function (term, limit) {
     let query = this.query().beginGroup();
     let createQuery = (field) => {
         let queryField = (splittedTerm) => {
-            query.contains(field, splittedTerm, true);
+            query.contains(field, splittedTerm, casing);
         };
         query.beginOrGroup();
         terms.forEach(queryField);
@@ -144,7 +147,10 @@ Realm.Object[doCreate] = function (data) {
         return;
     }
     if (typeof this.transform === 'function') {
-        this.transform(data);
+        let res = this.transform(data);
+        if (res !== undefined) {
+            data = res;
+        }
     }
     /* istanbul ignore next  */
     if (typeof this.syncObject === 'function') {
@@ -220,7 +226,10 @@ Realm.Object[doInsert] = function (data) {
         return;
     }
     if (typeof this.transform === 'function') {
-        this.transform(data);
+        let res = this.transform(data);
+        if (res !== undefined) {
+            data = res;
+        }
     }
     /* istanbul ignore next  */
     if (typeof this.syncObject === 'function') {
