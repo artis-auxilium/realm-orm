@@ -147,7 +147,10 @@ Realm.Object[doCreate] = function (data) {
         return;
     }
     if (typeof this.transform === 'function') {
-        this.transform(data);
+        let res = this.transform(data);
+        if (res !== undefined) {
+            data = res;
+        }
     }
     /* istanbul ignore next  */
     if (typeof this.syncObject === 'function') {
@@ -223,7 +226,10 @@ Realm.Object[doInsert] = function (data) {
         return;
     }
     if (typeof this.transform === 'function') {
-        this.transform(data);
+        let res = this.transform(data);
+        if (res !== undefined) {
+            data = res;
+        }
     }
     /* istanbul ignore next  */
     if (typeof this.syncObject === 'function') {
