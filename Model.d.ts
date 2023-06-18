@@ -4,6 +4,7 @@ import * as Realm from 'realm'
 interface SearchOption {
     stringFields?: string[]
     limit?: number,
+    casing?: boolean
 }
 
 interface SearchOptionQuery extends SearchOption{
