@@ -7,25 +7,38 @@ export declare type CollectionOperator = 'ALL' | 'NONE' | 'ANY' | 'SOME' | ''
 export declare type EqualValueType = string | number | boolean | Date | RawQuery;
 export declare type CompareValueType = number | Date | RawQuery;
 type keyOfType<T, KT> = { [K in keyof T]: T[K] extends KT ? K : never }[keyof T];
-type keyOfCompareValueType<T extends Model<T>> = NestedKeyOfType<T, CompareValueType>
-type keyOfEqualValueType<T extends Model<T>> = NestedKeyOfType<T, EqualValueType>
-type keyOfStringType<T extends Model<T>> = NestedKeyOfType<T, string>
-type keyOfNumberType<T extends Model<T>> = NestedKeyOfType<T, number>;
+type keyOfCompareValueType<T extends Model<T>> = NestedKeyOfType<T, CompareValueType, undefined>
+type keyOfEqualValueType<T extends Model<T>> = NestedKeyOfType<T, EqualValueType, undefined>
+type keyOfStringType<T extends Model<T>> = NestedKeyOfType<T, string, undefined>
+type keyOfNumberType<T extends Model<T>> = NestedKeyOfType<T, number, undefined>;
 type NonFunctionPropertyNames<T> = { [K in keyof T]: T[K] extends Function ? never : K }[keyof Partial<T>];
 type NonFunctionProperties<T> = Pick<Partial<T>, NonFunctionPropertyNames<T>>;
 declare type groupCallback = (cb: RealmQuery<any>) => RealmQuery<any>
-// add `& (string | number)` to the keyof ObjectType
+
+export type NestedAverageOf<ObjectType> =
+{[Key in keyof ObjectType & (string | number) as `@avg.${Key}` | `@max.${Key}`| `@min.${Key}`| `@sum.${Key}`]: ObjectType[Key] extends Function ? never : ObjectType[Key] extends number ? number : never
+} & {'@count': number};
+
+type Flatten<Type> = Type extends string ? never : Type extends Realm.Collection<infer Item> | Array<infer Item> ? Item & NestedAverageOf<Item> : never;
+
 type NestedKeyOf<ObjectType extends Model<ObjectType>> =
 {[Key in keyof ObjectType & (string | number)]: ObjectType[Key] extends Function? never : ObjectType[Key] extends Model<ObjectType[Key]>
 ? `${Key}` | `${Key}.${NestedKeyOf<ObjectType[Key]>}`
 : `${Key}`
 }[keyof ObjectType & (string | number)];
-type NestedKeyOfType<ObjectType extends Model<ObjectType>, T> =
+type NestedKeyOfType<ObjectType extends Model<ObjectType>, T, KeyFrom extends undefined | string | number> =
 {[Key in keyof ObjectType & (string | number )]:
-        ObjectType[Key] extends Function ? never :
-            ObjectType[Key] extends T ? `${Key}` :
-                ObjectType[Key] extends Model<ObjectType[Key]>? `${Key}.${NestedKeyOfType<ObjectType[Key], T>}`
-                    : never
+        ObjectType[Key] extends Function ?
+            never :
+            ObjectType[Key] extends T ?
+                `${Key}` :
+                ObjectType[Key] extends Model<ObjectType[Key]> ?
+                    `${Key}.${NestedKeyOfType<ObjectType[Key], T, undefined>}` :
+                    Flatten<ObjectType[Key]> extends Model<Flatten<ObjectType[Key]>> ?
+                        KeyFrom extends undefined ?
+                            `${Key}.${NestedKeyOfType<Flatten<ObjectType[Key]>, T, undefined>}` :
+                            `${KeyFrom}.${Key}.${NestedKeyOfType<Flatten<ObjectType[Key]>, T, KeyFrom>}`
+                        :never
 }[keyof ObjectType & (string | number)];
 
 
@@ -37,9 +50,17 @@ declare class RealmQuery<M extends Model<M>> {
     private objects;
     private criteria;
     constructor(objects?: Results<M>);
-    addCriteria(critera: any): RealmQuery<M>;
+    addCriteria(criteria: any): RealmQuery<M>;
     private getFilteredObjects(): Realm.Results<M>;
+
+    /**
+     * Get sql value with placeholder
+     */
     toString(): string;
+
+    /**
+     * Get sql with value
+     */
     debug(): string;
 
     /**

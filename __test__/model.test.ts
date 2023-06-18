@@ -37,7 +37,8 @@ describe('Model', () => {
         createdAt: new Date('2011-09-26 16:42:17'),
         place: {
           name: 'Place',
-          id: 1
+          id: 1,
+          nb_peoples: 15
         },
         holidays: [
           {
