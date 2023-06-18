@@ -1,9 +1,9 @@
 /// <reference types="realm" />
-import { Results } from 'realm';
+import {Collection, Results} from 'realm';
 import Model from "../Model";
-import Person from "../__test__/models/Person";
-import Holiday from "../__test__/models/Holiday";
+
 export declare type ILogicOperator = 'AND' | 'OR';
+export declare type CollectionOperator = 'ALL' | 'NONE' | 'ANY' | 'SOME' | ''
 export declare type EqualValueType = string | number | boolean | Date | RawQuery;
 export declare type CompareValueType = number | Date | RawQuery;
 type keyOfType<T, KT> = { [K in keyof T]: T[K] extends KT ? K : never }[keyof T];
@@ -119,10 +119,11 @@ declare class RealmQuery<M extends Model<M>> {
      * @param fieldName {string}
      * @param from {CompareValueType}
      * @param to {CompareValueType}
+     * @param {CollectionOperator} collectionOperator
      * @return {RealmQuery}
      */
-    between(fieldName: keyOfCompareValueType<M>, from: CompareValueType, to: CompareValueType): RealmQuery<M>;
-    orBetween(fieldName: keyof M, from: CompareValueType, to: CompareValueType): RealmQuery<M>;
+    between(fieldName: keyOfCompareValueType<M>, from: CompareValueType, to: CompareValueType, collectionOperator?: CollectionOperator): RealmQuery<M>;
+    orBetween(fieldName: keyOfCompareValueType<M>, from: CompareValueType, to: CompareValueType, collectionOperator?: CollectionOperator): RealmQuery<M>;
 
     /**
      * Condition that the value of field begins with the specified string
@@ -174,35 +175,42 @@ declare class RealmQuery<M extends Model<M>> {
      *
      * @param fieldName {string}
      * @param value {EqualValueType}
+     * @param {CollectionOperator} collectionOperator
      * @return {RealmQuery}
      */
-    equalTo(fieldName: keyOfEqualValueType<M>, value: EqualValueType): RealmQuery<M>;
+    equalTo(fieldName: keyOfEqualValueType<M>, value: EqualValueType, collectionOperator?: CollectionOperator): RealmQuery<M>;
     /**
      * or-equal-to comparison
      *
      * @param fieldName {string}
      * @param value {EqualValueType}
+     * @param {CollectionOperator} collectionOperator
+     *
      * @return {RealmQuery}
      */
-    orEqualTo(fieldName: keyOfEqualValueType<M>, value: EqualValueType): RealmQuery<M>;
+    orEqualTo(fieldName: keyOfEqualValueType<M>, value: EqualValueType, collectionOperator?: CollectionOperator): RealmQuery<M>;
 
     /**
      * Not-equal-to comparison
      *
      * @param fieldName {string}
      * @param value {EqualValueType}
+     * @param {CollectionOperator} collectionOperator
+     *
      * @return {RealmQuery}
      */
-    notEqualTo(fieldName: keyOfEqualValueType<M>, value: EqualValueType): RealmQuery<M>;
+    notEqualTo(fieldName: keyOfEqualValueType<M>, value: EqualValueType, collectionOperator?: CollectionOperator): RealmQuery<M>;
 
     /**
      * OR Equal-to comparison
      *
      * @param fieldName {string}
      * @param value {EqualValueType}
+     * @param {CollectionOperator} collectionOperator
+     *
      * @return {RealmQuery}
      */
-    orNotEqualTo(fieldName: keyOfEqualValueType<M>, value: EqualValueType): RealmQuery<M>;
+    orNotEqualTo(fieldName: keyOfEqualValueType<M>, value: EqualValueType, collectionOperator?: CollectionOperator): RealmQuery<M>;
 
 
     /**
@@ -210,84 +218,109 @@ declare class RealmQuery<M extends Model<M>> {
      *
      * @param fieldName {string}
      * @param value {CompareValueType}
+     * @param {CollectionOperator} collectionOperator
+     *
      * @return {RealmQuery}
      */
-    greaterThan(fieldName: keyOfCompareValueType<M>, value: CompareValueType): RealmQuery<M>;
+    greaterThan(fieldName: keyOfCompareValueType<M>, value: CompareValueType, collectionOperator?: CollectionOperator): RealmQuery<M>;
     /**
      * or Greater-than comparison
      *
      * @param fieldName {string}
      * @param value {CompareValueType}
+     * @param {CollectionOperator} collectionOperator
+     *
      * @return {RealmQuery}
      */
-    orGreaterThan(fieldName: keyOfCompareValueType<M>, value: CompareValueType): RealmQuery<M>;
+    orGreaterThan(fieldName: keyOfCompareValueType<M>, value: CompareValueType, collectionOperator?: CollectionOperator): RealmQuery<M>;
     /**
      * greater-than-or-equal-to comparison
      *
      * @param fieldName {string}
      * @param value {CompareValueType}
+     * @param {CollectionOperator} collectionOperator
+     *
      * @return {RealmQuery}
      */
-    greaterThanOrEqualTo(fieldName: keyOfCompareValueType<M>, value: CompareValueType): RealmQuery<M>;
+    greaterThanOrEqualTo(fieldName: keyOfCompareValueType<M>, value: CompareValueType, collectionOperator?: CollectionOperator): RealmQuery<M>;
     /**
      * or greater-than-or-equal-to comparison
      *
      * @param fieldName {string}
      * @param value {CompareValueType}
+     * @param {CollectionOperator} collectionOperator
+     *
      * @return {RealmQuery}
      */
-    orGreaterThanOrEqualTo(fieldName: keyOfCompareValueType<M>, value: CompareValueType): RealmQuery<M>;
+    orGreaterThanOrEqualTo(fieldName: keyOfCompareValueType<M>, value: CompareValueType, collectionOperator?: CollectionOperator): RealmQuery<M>;
     /**
      * Less-than comparison
      *
      * @param fieldName {string}
      * @param value {CompareValueType}
+     * @param {CollectionOperator} collectionOperator
+     *
      * @return {RealmQuery}
      */
-    lessThan(fieldName: keyOfCompareValueType<M>, value: CompareValueType): RealmQuery<M>;
+    lessThan(fieldName: keyOfCompareValueType<M>, value: CompareValueType, collectionOperator?: CollectionOperator): RealmQuery<M>;
     /**
      * Or Less-than comparison
      *
      * @param fieldName {string}
      * @param value {CompareValueType}
+     * @param {CollectionOperator} collectionOperator
+     *
      * @return {RealmQuery}
      */
-    orLessThan(fieldName: keyOfCompareValueType<M>, value: CompareValueType): RealmQuery<M>;
+    orLessThan(fieldName: keyOfCompareValueType<M>, value: CompareValueType, collectionOperator?: CollectionOperator): RealmQuery<M>;
     /**
      * Less-than-or-equal-to comparison
      *
      * @param fieldName {string}
      * @param value {CompareValueType}
+     * @param {CollectionOperator} collectionOperator
+     *
      * @return {RealmQuery}
      */
-    lessThanOrEqualTo(fieldName: keyOfCompareValueType<M>, value: CompareValueType): RealmQuery<M>;
+    lessThanOrEqualTo(fieldName: keyOfCompareValueType<M>, value: CompareValueType, collectionOperator?: CollectionOperator): RealmQuery<M>;
     /**
      * OR Less-than-or-equal-to comparison
      *
      * @param fieldName {string}
      * @param value {CompareValueType}
+     * @param {CollectionOperator} collectionOperator
+     *
      * @return {RealmQuery}
      */
-    orLessThanOrEqualTo(fieldName: keyOfCompareValueType<M>, value: CompareValueType): RealmQuery<M>;
+    orLessThanOrEqualTo(fieldName: keyOfCompareValueType<M>, value: CompareValueType, collectionOperator?: CollectionOperator): RealmQuery<M>;
     /**
      * In comparison
      *
      * @param fieldName {string}
      * @param values {EqualValueType[]}
+     * @param {CollectionOperator} collectionOperator
+     *
      * @return {RealmQuery}
      */
-    in(fieldName: keyOfEqualValueType<M>, values: EqualValueType[]): RealmQuery<M>;
-    orIn(fieldName: keyOfEqualValueType<M>, values: EqualValueType[]): RealmQuery<M>;
-    notIn(fieldName: keyOfEqualValueType<M>, values: EqualValueType[]): RealmQuery<M>;
-    orNotIn(fieldName: keyOfEqualValueType<M>, values: EqualValueType[]): RealmQuery<M>;
-    isEmpty(fieldName: keyOfStringType<M>): RealmQuery<M>;
-    isNotEmpty(fieldName: keyOfStringType<M>): RealmQuery<M>;
-    orIsEmpty(fieldName: keyOfStringType<M>): RealmQuery<M>;
-    orIsNotEmpty(fieldName: keyOfStringType<M>): RealmQuery<M>;
-    isNotNull(fieldName: NestedKeyOf<M> | string): RealmQuery<M>;
-    orIsNotNull(fieldName: NestedKeyOf<M> | string): RealmQuery<M>;
-    isNull(fieldName: NestedKeyOf<M>| string): RealmQuery<M>;
-    orIsNull(fieldName: NestedKeyOf<M>| string): RealmQuery<M>;
+    in(fieldName: keyOfEqualValueType<M>, values: EqualValueType[], collectionOperator?: CollectionOperator): RealmQuery<M>;
+
+    /**
+     *
+     * @param {string} fieldName
+     * @param {EqualValueType[]} values
+     * @param {CollectionOperator} collectionOperator
+     */
+    orIn(fieldName: keyOfEqualValueType<M>, values: EqualValueType[], collectionOperator?: CollectionOperator): RealmQuery<M>;
+    notIn(fieldName: keyOfEqualValueType<M>, values: EqualValueType[], collectionOperator?: CollectionOperator): RealmQuery<M>;
+    orNotIn(fieldName: keyOfEqualValueType<M>, values: EqualValueType[], collectionOperator?: CollectionOperator): RealmQuery<M>;
+    isEmpty(fieldName: keyOfStringType<M>, collectionOperator?: CollectionOperator): RealmQuery<M>;
+    isNotEmpty(fieldName: keyOfStringType<M>, collectionOperator?: CollectionOperator): RealmQuery<M>;
+    orIsEmpty(fieldName: keyOfStringType<M>, collectionOperator?: CollectionOperator): RealmQuery<M>;
+    orIsNotEmpty(fieldName: keyOfStringType<M>, collectionOperator?: CollectionOperator): RealmQuery<M>;
+    isNotNull(fieldName: NestedKeyOf<M> | string, collectionOperator?: CollectionOperator): RealmQuery<M>;
+    orIsNotNull(fieldName: NestedKeyOf<M> | string, collectionOperator?: CollectionOperator): RealmQuery<M>;
+    isNull(fieldName: NestedKeyOf<M>| string, collectionOperator?: CollectionOperator): RealmQuery<M>;
+    orIsNull(fieldName: NestedKeyOf<M>| string, collectionOperator?: CollectionOperator): RealmQuery<M>;
 
     /**
      *

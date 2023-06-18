@@ -102,6 +102,14 @@ describe('RealmQuery', function () {
       query.equalTo('isDeleted', true);
       expect(query.debug()).toEqual('isDeleted == true');
     });
+    it('equalTo boolean collection', function () {
+      query.equalTo('isDeleted', true, 'ALL');
+      expect(query.debug()).toEqual('ALL isDeleted == true');
+    });
+    it('equalTo nested', function () {
+      query.equalTo('nestedField.test2', 25)
+      expect(query.debug()).toEqual('nestedField.test2 == 25')
+    });
   });
 
   describe('notEqualTo', function () {
@@ -127,6 +135,10 @@ describe('RealmQuery', function () {
     it('notEqualTo boolean', function () {
       query.notEqualTo('isDeleted', true);
       expect(query.debug()).toEqual('isDeleted != true');
+    });
+    it('notEqualTo boolean collection', function () {
+      query.notEqualTo('isDeleted', true, 'ALL');
+      expect(query.debug()).toEqual('ALL isDeleted != true');
     });
   });
 
@@ -185,6 +197,10 @@ describe('RealmQuery', function () {
       query.between('age', 20, 30);
       expect(query.debug()).toEqual('age BETWEEN {20, 30}');
     });
+    it('between number to number collection', function () {
+      query.between('age', 20, 30, 'ALL');
+      expect(query.debug()).toEqual('ALL age BETWEEN {20, 30}');
+    });
     it('between date to date', function () {
       const start = new Date();
       const end = new Date();
@@ -201,15 +217,28 @@ describe('RealmQuery', function () {
         .toEqual('field.test BETWEEN {5, 10} OR field2.test BETWEEN {20, 50}');
     });
 
+    it('should between collection', () => {
+      query.between('nestedField.test', 5, 10, 'ALL').orBetween('nestedField.test2', 20, 50, 'NONE');
+      expect(query.debug())
+        .toEqual('ALL nestedField.test BETWEEN {5, 10} OR NONE nestedField.test2 BETWEEN {20, 50}');
+    });
+
   });
 
-  describe('Basic comparation', function () {
+  describe('Basic comparator', function () {
 
     it('greaterThan number', function () {
       query.greaterThan('age', 20);
       expect(query.debug()).toEqual('age > 20');
       query.orGreaterThan('age', 22);
       expect(query.debug()).toEqual('age > 20 OR age > 22');
+    });
+
+    it('greaterThan number collection', function () {
+      query.greaterThan('age', 20, 'ALL');
+      expect(query.debug()).toEqual('ALL age > 20');
+      query.orGreaterThan('age', 22, 'ANY');
+      expect(query.debug()).toEqual('ALL age > 20 OR ANY age > 22');
     });
 
     it('greaterThan a date', function () {
@@ -230,11 +259,21 @@ describe('RealmQuery', function () {
       expect(query.debug()).toEqual(`createdAt >= ${ now.toString()}`);
     });
 
+    it('greaterThanOrEqualTo a date collection', function () {
+      const now = new Date();
+      query.greaterThanOrEqualTo('createdAt', now, 'ANY');
+      expect(query.debug()).toEqual(`ANY createdAt >= ${ now.toString()}`);
+    });
+
     it('lessThan number', function () {
       query.lessThan('age', 20);
       expect(query.debug()).toEqual('age < 20');
       query.orLessThan('age', 22);
       expect(query.debug()).toEqual('age < 20 OR age < 22');
+    });
+    it('lessThan number collection', function () {
+      query.lessThan('age', 20, 'ANY');
+      expect(query.debug()).toEqual('ANY age < 20');
     });
     it('lessThan a date', function () {
       const now = new Date();
@@ -248,6 +287,12 @@ describe('RealmQuery', function () {
       query.orLessThanOrEqualTo('age', 22);
       expect(query.debug()).toEqual('age <= 20 OR age <= 22');
     });
+    it('lessThanOrEqualTo number collection', function () {
+      query.lessThanOrEqualTo('age', 20, 'ANY');
+      expect(query.debug()).toEqual('ANY age <= 20');
+      query.orLessThanOrEqualTo('age', 22, 'SOME');
+      expect(query.debug()).toEqual('ANY age <= 20 OR SOME age <= 22');
+    });
     it('lessThanOrEqualTo a date', function () {
       const now = new Date();
       query.lessThanOrEqualTo('createdAt', now);
@@ -257,18 +302,41 @@ describe('RealmQuery', function () {
         expect(query.isNotNull('nestedField').orIsNotNull('field2').debug())
             .toEqual("nestedField != nil OR field2 != nil")
     });
+    it('should is not null collection', function () {
+        expect(query.isNotNull('nestedField','SOME').orIsNotNull('field2', 'SOME').debug())
+            .toEqual("SOME nestedField != nil OR SOME field2 != nil")
+    });
     it('should is null', function () {
         expect(query.isNull('nestedField').orIsNull('field2').debug())
             .toEqual("nestedField == nil OR field2 == nil")
+    });
+
+    it('should is null collection', function () {
+        expect(query.isNull('nestedField', 'ALL').orIsNull('field2', 'NONE').debug())
+            .toEqual("ALL nestedField == nil OR NONE field2 == nil")
     });
 
     it('should is not empty', function () {
         expect(query.isNotEmpty('name').orIsNotEmpty('field2').debug())
             .toEqual("name != '' OR field2 != ''")
     });
+
+    it('should is not empty collection', function () {
+        expect(query.isNotEmpty('name', 'ALL').orIsNotEmpty('field2', 'ALL').debug())
+            .toEqual("ALL name != '' OR ALL field2 != ''")
+    });
+    it('should is not empty collection', function () {
+        expect(query.isNotEmpty('name', 'ALL').orIsNotEmpty('field2', 'NONE').debug())
+            .toEqual("ALL name != '' OR NONE field2 != ''")
+    });
     it('should is empty', function () {
         expect(query.isEmpty('name').orIsEmpty('field2').debug())
             .toEqual("name == '' OR field2 == ''")
+    });
+
+    it('should is empty', function () {
+        expect(query.isEmpty('name', 'ALL').orIsEmpty('field2', 'NONE').debug())
+            .toEqual("ALL name == '' OR NONE field2 == ''")
     });
   });
   describe('In', function () {
@@ -278,11 +346,23 @@ describe('RealmQuery', function () {
       query.orIn('age', [ 20, 23 ]);
       expect(query.debug()).toEqual('id in { 1, 2 } OR age in { 20, 23 }');
     });
+    it('In array of number', function () {
+      query.in('id', [ 1, 2 ], 'ANY');
+      expect(query.debug()).toEqual('ANY id in { 1, 2 }');
+      query.orIn('age', [ 20, 23 ], 'SOME');
+      expect(query.debug()).toEqual('ANY id in { 1, 2 } OR SOME age in { 20, 23 }');
+    });
     it('not In', function () {
       query.notIn('id', [ 1, 2 ]);
       expect(query.debug()).toEqual('id in NONE { 1, 2 }');
       query.orNotIn('age', [ 4, 5 ]);
       expect(query.debug()).toEqual('id in NONE { 1, 2 } OR age in NONE { 4, 5 }');
+    });
+    it('not In Collection', function () {
+      query.notIn('id', [ 1, 2 ], 'NONE');
+      expect(query.debug()).toEqual('NONE id in NONE { 1, 2 }');
+      query.orNotIn('age', [ 4, 5 ], 'SOME');
+      expect(query.debug()).toEqual('NONE id in NONE { 1, 2 } OR SOME age in NONE { 4, 5 }');
     });
     it('In array of string', function () {
       query.in('status', [ 'ACTIVE', 'DEACTIVE' ]);
@@ -290,7 +370,7 @@ describe('RealmQuery', function () {
     });
   });
 
-  describe('Query with compound criterias', function () {
+  describe('Query with compound criteria', function () {
     it('complex query', function () {
       query
         .contains('name', 'phu', true)

@@ -1,3 +1,5 @@
+// noinspection JSUnusedGlobalSymbols
+
 let reducePath = (obj, index) => obj[index];
 
 /**
@@ -50,12 +52,12 @@ class RealmQuery {
 
   /**
    * @private
-   * @param {any} critera
-   * @param {Condition} condition
+   * @param {any} criteria
+   * @param {Condition?} condition
    * @returns {RealmQuery}
    * @memberof RealmQuery
    */
-  addCriteria (critera, condition) {
+  addCriteria (criteria, condition) {
     let group = this.criteria;
     if (this.path !== '') {
       group = this.path.split('.').reduce(reducePath, this.criteria);
@@ -63,7 +65,7 @@ class RealmQuery {
     if (group.length >= 1 && group[group.length - 1] !== 'NOT') {
       group.push(condition);
     }
-    group.push(critera);
+    group.push(criteria);
     return this;
   }
 
@@ -78,7 +80,7 @@ class RealmQuery {
   /**
    * @private
    * get filtered object
-   * @returns {Realm.Results}
+   * @returns {Realm.Results|Realm.Collection}
    */
   getFilteredObjects () {
     if ((this.sorted.length > 0 || this.distincts.length > 0) && this.criteria.length === 0) {
@@ -231,11 +233,15 @@ class RealmQuery {
    * @param {string} fieldName
    * @param {CompareValueType|CompareValueType[]} from
    * @param {CompareValueType} to
+   * @param {CollectionOperator} collectionOperator
    * @return {RealmQuery}
    */
-  between (fieldName, from, to) {
+  between (fieldName, from, to, collectionOperator = '') {
     let posFrom = this.addValue(from);
     let posTo = this.addValue(to);
+    if (collectionOperator.length > 0) {
+      fieldName = `${collectionOperator} ${fieldName}`;
+    }
     return this.addCriteria(`${fieldName} BETWEEN {$${posFrom}, $${posTo}}`, 'AND');
   }
 
@@ -245,11 +251,16 @@ class RealmQuery {
    * @param {string} fieldName
    * @param {CompareValueType} from
    * @param {CompareValueType} to
+   * @param {CollectionOperator} collectionOperator
+   *
    * @return {RealmQuery}
    */
-  orBetween (fieldName, from, to) {
+  orBetween (fieldName, from, to, collectionOperator = '') {
     let posFrom = this.addValue(from);
     let posTo = this.addValue(to);
+    if (collectionOperator.length > 0) {
+      fieldName = `${collectionOperator} ${fieldName}`;
+    }
     return this.addCriteria(`${fieldName} BETWEEN {$${posFrom}, $${posTo}}`, 'OR');
   }
 
@@ -259,6 +270,7 @@ class RealmQuery {
    * @param {string} fieldName
    * @param {string} value
    * @param {?boolean} casing  BEGINSWITH[c] or BEGINSWITH
+   * @param {Condition} condition
    * @return {RealmQuery}
    */
   beginsWith (fieldName, value, casing, condition = 'AND') {
@@ -283,6 +295,7 @@ class RealmQuery {
    * @param {string} fieldName
    * @param {string} value
    * @param {?boolean} casing  CONTAINS[c] or CONTAINS
+   * @param {Condition} condition
    * @return {RealmQuery}
    */
   contains (fieldName, value, casing, condition = 'AND') {
@@ -309,6 +322,7 @@ class RealmQuery {
    * @param {string} fieldName
    * @param {string} value
    * @param {boolean?} casing  ENDSWITH[c] or ENDSWITH
+   * @param {Condition} condition
    * @return {RealmQuery}
    */
   endsWith (fieldName, value, casing, condition = 'AND') {
@@ -333,10 +347,16 @@ class RealmQuery {
    *
    * @param {string} fieldName
    * @param {EqualValueType} value
+   * @param {CollectionOperator} collectionOperator
+   * @param {Condition} condition
+   *
    * @return {RealmQuery}
    */
-  equalTo (fieldName, value, condition = 'AND') {
+  equalTo (fieldName, value, collectionOperator = '', condition = 'AND') {
     let pos = this.addValue(value);
+    if (collectionOperator.length > 0) {
+      fieldName = `${collectionOperator} ${fieldName}`;
+    }
     return this.addCriteria(`${fieldName} == $${pos}`, condition);
   }
 
@@ -345,10 +365,12 @@ class RealmQuery {
    *
    * @param {string} fieldName
    * @param {EqualValueType} value
+   * @param {CollectionOperator} collectionOperator
+   *
    * @return {RealmQuery}
    */
-  orEqualTo (fieldName, value) {
-    return this.equalTo(fieldName, value, 'OR');
+  orEqualTo (fieldName, value, collectionOperator) {
+    return this.equalTo(fieldName, value,collectionOperator, 'OR');
   }
 
   /**
@@ -356,10 +378,16 @@ class RealmQuery {
    *
    * @param fieldName {string}
    * @param value {EqualValueType}
+   * @param {CollectionOperator} collectionOperator
+   * @param {Condition} condition
+   *
    * @return {RealmQuery}
    */
-  notEqualTo (fieldName, value, condition = 'AND') {
+  notEqualTo (fieldName, value, collectionOperator = '', condition = 'AND') {
     let pos = this.addValue(value);
+    if (collectionOperator.length > 0) {
+      fieldName = `${collectionOperator} ${fieldName}`;
+    }
     return this.addCriteria(`${fieldName} != $${pos}`, condition);
   }
 
@@ -368,10 +396,12 @@ class RealmQuery {
    *
    * @param fieldName {string}
    * @param value {EqualValueType}
+   * @param {CollectionOperator} collectionOperator
+   *
    * @return {RealmQuery}
    */
-  orNotEqualTo (fieldName, value) {
-    return this.notEqualTo(fieldName, value, 'OR');
+  orNotEqualTo (fieldName, value, collectionOperator = '') {
+    return this.notEqualTo(fieldName, value, collectionOperator, 'OR');
   }
 
   /**
@@ -379,10 +409,16 @@ class RealmQuery {
    *
    * @param {string} fieldName
    * @param {CompareValueType} value
+   * @param {CollectionOperator} collectionOperator
+   * @param {Condition} condition
+   *
    * @return {RealmQuery}
    */
-  greaterThan (fieldName, value, condition = 'AND') {
+  greaterThan (fieldName, value, collectionOperator = '', condition = 'AND') {
     let pos = this.addValue(value);
+    if (collectionOperator.length > 0) {
+      fieldName = `${collectionOperator} ${fieldName}`;
+    }
     return this.addCriteria(`${fieldName} > $${pos}`, condition);
   }
 
@@ -391,20 +427,28 @@ class RealmQuery {
    *
    * @param {string} fieldName
    * @param {CompareValueType} value
+   * @param {CollectionOperator} collectionOperator
+   *
    * @return {RealmQuery}
    */
-  orGreaterThan (fieldName, value) {
-    return this.greaterThan (fieldName, value, 'OR');
+  orGreaterThan (fieldName, value, collectionOperator = '') {
+    return this.greaterThan (fieldName, value,collectionOperator,  'OR');
   }
   /**
    * greater-than-or-equal-to comparaison
    *
    * @param  {string} fieldName
    * @param {CompareValueType} value
+   * @param {CollectionOperator} collectionOperator
+   * @param {Condition} condition
+   *
    * @return {RealmQuery}
    */
-  greaterThanOrEqualTo (fieldName, value, condition = 'AND') {
+  greaterThanOrEqualTo (fieldName, value, collectionOperator = '', condition = 'AND') {
     let pos = this.addValue(value);
+    if (collectionOperator.length > 0) {
+      fieldName = `${collectionOperator} ${fieldName}`;
+    }
     return this.addCriteria(`${fieldName} >= $${pos}`, condition);
   }
 
@@ -413,10 +457,12 @@ class RealmQuery {
    *
    * @param  {string} fieldName
    * @param {CompareValueType} value
+   * @param {CollectionOperator} collectionOperator
+   *
    * @return {RealmQuery}
    */
-  orGreaterThanOrEqualTo (fieldName, value) {
-    return this.greaterThanOrEqualTo (fieldName, value, 'OR');
+  orGreaterThanOrEqualTo (fieldName, value, collectionOperator = '') {
+    return this.greaterThanOrEqualTo (fieldName, value, collectionOperator, 'OR');
   }
 
   /**
@@ -424,10 +470,16 @@ class RealmQuery {
    *
    * @param {string} fieldName
    * @param {CompareValueType} value
+   * @param {CollectionOperator} collectionOperator
+   * @param {Condition} condition
+   *
    * @return {RealmQuery}
    */
-  lessThan (fieldName, value, condition = 'AND') {
+  lessThan (fieldName, value,collectionOperator = '', condition = 'AND') {
     let pos = this.addValue(value);
+    if (collectionOperator.length > 0) {
+      fieldName = `${collectionOperator} ${fieldName}`;
+    }
     return this.addCriteria(`${fieldName} < $${pos}`, condition);
   }
   /**
@@ -435,19 +487,27 @@ class RealmQuery {
    *
    * @param {string} fieldName
    * @param {CompareValueType} value
+   * @param {CollectionOperator} collectionOperator
+   *
    * @return {RealmQuery}
    */
-  orLessThan (fieldName, value) {
-    return this.lessThan(fieldName, value, 'OR');
+  orLessThan (fieldName, value, collectionOperator = '') {
+    return this.lessThan(fieldName, value,collectionOperator , 'OR');
   }
   /**
    * Less-than-or-equal-to comparaison
    *
    * @param {string} fieldName
    * @param {CompareValueType} value
+   * @param {CollectionOperator} collectionOperator
+   * @param {Condition} condition
+   *
    * @return {RealmQuery}
    */
-  lessThanOrEqualTo (fieldName, value, condition = 'AND') {
+  lessThanOrEqualTo (fieldName, value, collectionOperator = '', condition = 'AND') {
+    if (collectionOperator.length > 0) {
+      fieldName = `${collectionOperator} ${fieldName}`;
+    }
     let pos = this.addValue(value);
     return this.addCriteria(`${fieldName} <= $${pos}`, condition);
   }
@@ -456,20 +516,25 @@ class RealmQuery {
    *
    * @param {string} fieldName
    * @param {CompareValueType} value
+   * @param {CollectionOperator} collectionOperator
    * @return {RealmQuery}
    */
-  orLessThanOrEqualTo (fieldName, value) {
-    return this.lessThanOrEqualTo(fieldName, value, 'OR');
+  orLessThanOrEqualTo (fieldName, value, collectionOperator = '') {
+    return this.lessThanOrEqualTo(fieldName, value, collectionOperator, 'OR');
   }
   /**
    * In comparaison
    *
    * @param {string} fieldName
    * @param {EqualValueType[]} values
+   * @param {CollectionOperator} collectionOperator
    * @param {Condition} condition
    * @return {RealmQuery}
    */
-  in (fieldName, values, condition = 'AND') {
+  in (fieldName, values, collectionOperator = '', condition = 'AND') {
+    if (collectionOperator.length > 0) {
+      fieldName = `${collectionOperator} ${fieldName}`;
+    }
       let pos = this.addValue(values);
       return this.addCriteria(`${fieldName} in $${pos}`, condition);
   }
@@ -479,10 +544,11 @@ class RealmQuery {
    *
    * @param {string} fieldName
    * @param {EqualValueType[]} values
+   * @param {CollectionOperator} collectionOperator
    * @return {RealmQuery}
    */
-  orIn (fieldName, values) {
-    return this.in(fieldName, values, 'OR');
+  orIn (fieldName, values, collectionOperator = '') {
+    return this.in(fieldName, values,collectionOperator, 'OR');
   }
 
   /**
@@ -490,12 +556,16 @@ class RealmQuery {
    *
    * @param {string} fieldName
    * @param {EqualValueType[]} values
+   * @param {CollectionOperator} collectionOperator
    * @param {Condition} condition
    * @return {RealmQuery}
    */
-  notIn (fieldName, values, condition = 'AND') {
-      let pos = this.addValue(values);
-      return this.addCriteria(`${fieldName} in NONE $${pos}`, condition);
+  notIn (fieldName, values, collectionOperator = '', condition = 'AND') {
+    if (collectionOperator.length > 0) {
+      fieldName = `${collectionOperator} ${fieldName}`;
+    }
+    let pos = this.addValue(values);
+    return this.addCriteria(`${fieldName} in NONE $${pos}`, condition);
   }
 
   /**
@@ -503,57 +573,114 @@ class RealmQuery {
    *
    * @param {string} fieldName
    * @param {EqualValueType[]} values
+   * @param {CollectionOperator} collectionOperator
    * @return {RealmQuery}
    */
-  orNotIn (fieldName, values) {
-    return this.notIn(fieldName, values, 'OR');
+  orNotIn (fieldName, values, collectionOperator = '') {
+    return this.notIn(fieldName, values, collectionOperator, 'OR');
   }
 
   /**
    * not null comparaison
    * @param {string} fieldName
+   * @param {CollectionOperator} collectionOperator
+   *
    * @returns {RealmQuery}
    */
-  isNotNull (fieldName) {
+  isNotNull (fieldName, collectionOperator = '') {
+    if (collectionOperator.length > 0) {
+      fieldName = `${collectionOperator} ${fieldName}`;
+    }
     return this.addCriteria(`${fieldName} != nil`, 'AND');
   }
   /**
    * null comparaison
    * @param {string} fieldName
+   * @param {CollectionOperator} collectionOperator
+   *
    * @returns {RealmQuery}
    */
-  isNull (fieldName) {
+  isNull (fieldName, collectionOperator = '') {
+    if (collectionOperator.length > 0) {
+      fieldName = `${collectionOperator} ${fieldName}`;
+    }
     return this.addCriteria(`${fieldName} == nil`, 'AND');
   }  /**
    * not null comparaison
    * @param {string} fieldName
+   * @param {CollectionOperator} collectionOperator
+   *
    * @returns {RealmQuery}
    */
-  orIsNotNull (fieldName) {
+  orIsNotNull (fieldName, collectionOperator = '') {
+    if (collectionOperator.length > 0) {
+      fieldName = `${collectionOperator} ${fieldName}`;
+    }
     return this.addCriteria(`${fieldName} != nil`, 'OR');
   }
   /**
    * null comparaison
    * @param {string} fieldName
+   * @param {CollectionOperator} collectionOperator
+   *
    * @returns {RealmQuery}
    */
-  orIsNull (fieldName) {
+  orIsNull (fieldName, collectionOperator = '') {
+    if (collectionOperator.length > 0) {
+      fieldName = `${collectionOperator} ${fieldName}`;
+    }
     return this.addCriteria(`${fieldName} == nil`, 'OR');
   }
 
-  isEmpty (fieldName) {
+  /**
+   *
+   * @param fieldName
+   * @param {CollectionOperator} collectionOperator
+   * @return {RealmQuery}
+   */
+  isEmpty (fieldName, collectionOperator = '') {
+    if (collectionOperator.length > 0) {
+      fieldName = `${collectionOperator} ${fieldName}`;
+    }
     return this.addCriteria(`${fieldName} == ''`, 'AND');
   }
 
-  isNotEmpty (fieldName) {
+  /**
+   *
+   * @param fieldName
+   * @param {CollectionOperator} collectionOperator
+   * @return {RealmQuery}
+   */
+  isNotEmpty (fieldName, collectionOperator = '') {
+    if (collectionOperator.length > 0) {
+      fieldName = `${collectionOperator} ${fieldName}`;
+    }
     return this.addCriteria(`${fieldName} != ''`, 'AND');
   }
 
-  orIsEmpty (fieldName) {
+  /**
+   *
+   * @param fieldName
+   * @param {CollectionOperator} collectionOperator
+   * @return {RealmQuery}
+   */
+  orIsEmpty (fieldName, collectionOperator = '') {
+    if (collectionOperator.length > 0) {
+      fieldName = `${collectionOperator} ${fieldName}`;
+    }
     return this.addCriteria(`${fieldName} == ''`, 'OR');
   }
 
-  orIsNotEmpty (fieldName) {
+  /**
+   *
+   * @param fieldName
+   * @param {CollectionOperator} collectionOperator
+   * @return {RealmQuery}
+   */
+  orIsNotEmpty (fieldName, collectionOperator = '') {
+    if (collectionOperator.length > 0) {
+      fieldName = `${collectionOperator} ${fieldName}`;
+    }
     return this.addCriteria(`${fieldName} != ''`, 'OR');
   }
 
