@@ -1,11 +1,11 @@
 import * as Realm from 'realm'
-import Model, { ModelStatic } from './Model'
+import Model from './Model'
+
+type LegacyConfiguration = Realm.Configuration & {  migration?: Realm.MigrationCallback, shouldCompactOnLaunch?: (totalBytes: number, usedBytes: number) => boolean}
+
 
 export default class DB {
-  constructor(option: Realm.Configuration)
-  static models: ModelStatic<any>[]
+  constructor(option: LegacyConfiguration)
   static db: Realm
   open(): Promise<Realm>
 }
-
-export const model: Model<any>
