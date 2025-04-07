@@ -83,7 +83,7 @@ Realm.Object.query = function () {
 /**
  * Find object by its primary key
  * @static
- * @param {number} id
+ * @param {any} id
  * @returns {Model}
  * @memberof Model
  */
@@ -113,52 +113,6 @@ Realm.Object.ids = function () {
     return this.all().map((obj) => obj[this.schema.primaryKey]);
 }
 
-const doCreate = Symbol('realmOrmDoCreate')
-/**
- * insert new object in database and return object
- * @static
- * @param {array|any} data
- *
- * @returns {Promise<Model|Model[]>}
- * @memberof Model
- */
-Realm.Object.create = function (data) {
-    return new Promise((resolve) => {
-        if (Array.isArray(data)) {
-            DB.db.write(() => {
-                resolve(data.map(this[doCreate].bind(this)));
-            });
-            return;
-        }
-        DB.db.write(() => {
-            resolve(this[doCreate](data));
-        });
-    });
-}
-
-
-/**
- * @private
- * @param {any} data
- */
-Realm.Object[doCreate] = function (data) {
-    /* istanbul ignore next  */
-    if (!data) {
-        return;
-    }
-    if (typeof this.transform === 'function') {
-        let res = this.transform(data);
-        if (res !== undefined) {
-            data = res;
-        }
-    }
-    /* istanbul ignore next  */
-    if (typeof this.syncObject === 'function') {
-        this.syncObject(data);
-    }
-    return DB.db.create(this.schema.name, data, this.hasPrimary(data));
-}
-
 /**
  * update object
  * @static
@@ -171,10 +125,13 @@ Realm.Object.update = function (object, data) {
     return new Promise((resolve, reject) => {
         try {
             DB.db.write(() => {
+                DB.db.currentUpdateMode = Realm.UpdateMode.Modified;
                 Object.keys(data).forEach((key) => {
+                    if (this.schema && this.schema.primaryKey && key === this.schema.primaryKey) {
+                        return;
+                    }
                     object[key] = data[key];
                 })
-                // merge(data, object);
                 resolve();
             });
 
@@ -210,12 +167,10 @@ Realm.Object.insert = function (data) {
     return new Promise((resolve) => {
         DB.db.write(() => {
             if (Array.isArray(data)) {
-                data.forEach(this[doInsert].bind(this));
-                resolve();
+                resolve(data.map(this[doInsert].bind(this)));
                 return;
             }
-            this[doInsert](data);
-            resolve();
+            resolve(this[doInsert](data));
         });
     });
 }
@@ -235,7 +190,7 @@ Realm.Object[doInsert] = function (data) {
     if (typeof this.syncObject === 'function') {
         this.syncObject(data);
     }
-    DB.db.create(this.schema.name, data, this.hasPrimary(data));
+    return DB.db.create(this.schema.name, data, this.hasPrimary(data));
 }
 
 Realm.Object.hasPrimary = function (data) {
