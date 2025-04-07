@@ -1,8 +1,9 @@
 // @ts-check
 import Model from '../../Model';
+import Realm from "realm";
 
 export default class CPerson extends Model<CPerson> {
-  static schema = {
+  static schema: Realm.ObjectSchema = {
     name: 'CPerson',
     properties: {
       name: 'string',

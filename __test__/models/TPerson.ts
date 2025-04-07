@@ -1,7 +1,8 @@
 import Model from "../../Model";
+import Realm from "realm";
 
 export default class TPerson extends Model<TPerson> {
-  static schema = {
+  static schema: Realm.ObjectSchema = {
     name: 'TPerson',
     primaryKey: 'id',
     properties: {

@@ -14,8 +14,7 @@
         * [.find(id)](#Model.find) ⇒ [<code>Model</code>](#Model)
         * [.all()](#Model.all) ⇒ <code>Realm.Results</code>
         * [.ids()](#Model.ids) ⇒ <code>Array</code>
-        * [.insert(data)](#Model.insert) ⇒ <code>Promise.&lt;void&gt;</code>
-        * [.create(data)](#Model.create) ⇒ <code>Promise.&lt;(Model\|Array.&lt;Model&gt;)&gt;</code>
+        * [.insert(data)](#Model.create) ⇒ <code>Promise.&lt;(Model\|Array.&lt;Model&gt;)&gt;</code>
         * [.update(object, data)](#Model.update) ⇒ <code>Promise.&lt;void&gt;</code>
         * [.delete(object)](#Model.delete) ⇒ <code>Promise.&lt;void&gt;</code>
 
@@ -137,18 +136,7 @@ Get all primaryKey of Model
 
 <a name="Model.insert"></a>
 
-### Model.insert(data) ⇒ <code>Promise.&lt;void&gt;</code>
-insert new object in database
-
-**Kind**: static method of [<code>Model</code>](#Model)
-
-| Param | Type |
-| --- | --- |
-| data | <code>array</code> \| <code>any</code> |
-* * *
-<a name="Model.create"></a>
-
-### Model.create(data) ⇒ <code>Promise.&lt;(Model\|Array.&lt;Model&gt;)&gt;</code>
+### Model.create(data) ⇒ <code>Promise.&lt;void&gt;</code>
 insert new object in database and return object
 
 **Kind**: static method of [<code>Model</code>](#Model)
@@ -156,6 +144,7 @@ insert new object in database and return object
 | Param | Type |
 | --- | --- |
 | data | <code>array</code> \| <code>any</code> |
+
 * * *
 <a name="Model.update"></a>
 

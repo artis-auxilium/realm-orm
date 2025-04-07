@@ -386,6 +386,6 @@ declare class RealmQuery<M extends Model<M>> {
      * Create new query
      * @param objects {Realm.Collection}
      */
-    static query<M extends Model<M>>(objects?: Results<M>): RealmQuery<M>;
+    static query<M extends Model<M>>(objects?: Results<M> | Results<Realm.AnyRealmObject>): RealmQuery<M>;
 }
 export default RealmQuery;

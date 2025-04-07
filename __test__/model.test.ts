@@ -3,6 +3,7 @@ import Person from './models/Person';
 import TPerson from './models/TPerson';
 import Holiday from './models/Holiday';
 import CPerson from './models/CPerson';
+import Realm from "realm";
 import * as fs from "fs";
 import DB from '../';
 import Place from "./models/Place";
@@ -137,7 +138,7 @@ describe('Model', () => {
   });
 
   it('Should create and return object created without primary key', () => {
-    TPerson.create({
+    TPerson.insert({
       id: 15478,
       name: 'third person',
       age: 96,
@@ -148,7 +149,7 @@ describe('Model', () => {
     });
   });
   it('Should create and return object created with primary key', () => {
-    CPerson.create({
+    CPerson.insert({
       name: 'third person',
       age: 96,
       createdAt: new Date(),
@@ -159,7 +160,7 @@ describe('Model', () => {
   });
 
   it('Should create and return  array of object created without primary key', () => {
-    CPerson.create([
+    CPerson.insert([
       {
         name: 'third person',
         age: 96,

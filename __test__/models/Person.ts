@@ -1,10 +1,10 @@
-// @ts-check
 import Holiday from "./Holiday";
 import Model from "../../Model";
 import Place from "./Place";
+import Realm from "realm";
 
 export default class Person extends Model<Person> {
-    static schema = {
+    static schema: Realm.ObjectSchema = {
         name: 'Person',
         primaryKey: 'id',
         properties: {

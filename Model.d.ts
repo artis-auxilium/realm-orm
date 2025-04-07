@@ -37,10 +37,7 @@ export default abstract class Model<M> extends Realm.Object<M> {
     static query<T extends M>(): RealmQuery<T>
 
     // @ts-ignore
-    static insert<T extends M>(object: NonFunctionProperties<T> | NonFunctionProperties<T>[]): Promise<void>
-
-    // @ts-ignore
-    static create<T extends M>(object: NonFunctionProperties<T> | NonFunctionProperties<T>[]): Promise<T>
+    static insert<T extends M>(object: NonFunctionProperties<T> | NonFunctionProperties<T>[]): Promise<T>
 
     static ids(): number[]
 
